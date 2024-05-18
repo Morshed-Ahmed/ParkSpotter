@@ -30,10 +30,111 @@ const EmployeeRegistrationForm = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  // const handleSubmit = (e) => {
+  //   e.preventDefault()
+
+  //   console.log(formData)
+  // }
+
+  // test
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault()
+
+  //   const userId = localStorage.getItem("user_id")
+  //   const data = {
+  //     "username": "employee",
+  //     "first_name": "Jafor_bhai",
+  //     "last_name": "Sadek",
+  //     "mobile_no": "0909090",
+  //     "qualification": "A+",
+  //     "nid_card_no": "498899",
+  //     "email":"jafor@gmail.com",
+  //     "password":"employee123",
+  //     "confirm_password":"employee123",
+  //     "address": "A/17, Road 6, Eastern Banakunjo 2, Banasree",
+  //     "joined_date": "2024-05-18T23:23:34.469692+06:00",
+  //     "park_owner_id": userId,
+
+  // }
+
+  //   try {
+  //     const token = localStorage.getItem("token")
+
+  //     const response = await fetch(
+  //       "https://parkspottermain.pythonanywhere.com/accounts/employee-register/",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           "Authorization": `Token ${token}`,
+  //         },
+  //         body: JSON.stringify(data),
+  //       }
+  //     )
+
+  //     if (response.status === 404) {
+  //       console.error("Endpoint not found:", response.statusText)
+
+  //       return
+  //     }
+
+  //     const responseData = await response.json()
+  //     console.log("Parsed JSON response:", responseData)
+  //   } catch (error) {
+  //     console.error("Error creating employee:", error)
+  //   }
+  // }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // API call to submit the formData
-    console.log(formData)
+
+    const formData = new FormData(e.target)
+
+    const userId = localStorage.getItem("user_id")
+    const data = {
+      park_owner_id: userId,
+      username: "siyan2",
+      first_name: "Jafor_bhai",
+      last_name: "Sadek",
+      mobile_no: "0000000111",
+      qualification: "A+",
+      nid_card_no: "498899",
+      email: "jafor3@gmail.com",
+      password: "employee123",
+      confirm_password: "employee123",
+      address: "A/17, Road 6, Eastern Banakunjo 2, Banasree",
+      joined_date: "2024-05-18T23:23:34.469692+06:00",
+    }
+
+    try {
+      const token = localStorage.getItem("token")
+      if (!token) {
+        console.error("No token found in localStorage")
+        return
+      }
+
+      const response = await fetch(
+        "https://parkspottermain.pythonanywhere.com/accounts/employee-register/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+          body: JSON.stringify(data),
+        }
+      )
+
+      if (response.status === 404) {
+        console.error("Endpoint not found:", response.statusText)
+        return
+      }
+
+      const responseData = await response.json()
+      console.log("Parsed JSON response:", responseData)
+    } catch (error) {
+      console.error("Error creating employee:", error)
+    }
   }
 
   return (
@@ -50,7 +151,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.mobile_no}
             onChange={handleChange}
             placeholder="Enter your mobile number"
-            required
+            // required
           />
 
           <Label htmlFor="username">Username</Label>
@@ -61,7 +162,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.username}
             onChange={handleChange}
             placeholder="Enter your username"
-            required
+            // required
           />
 
           <Label htmlFor="password">Password</Label>
@@ -72,7 +173,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.password}
             onChange={handleChange}
             placeholder="Enter your password"
-            required
+            // required
           />
 
           <Label htmlFor="confirm_password">Confirm Password</Label>
@@ -83,7 +184,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.confirm_password}
             onChange={handleChange}
             placeholder="Confirm your password"
-            required
+            // required
           />
 
           <Label htmlFor="first_name">First Name</Label>
@@ -94,7 +195,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.first_name}
             onChange={handleChange}
             placeholder="Enter your first name"
-            required
+            // required
           />
 
           <Label htmlFor="last_name">Last Name</Label>
@@ -105,7 +206,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.last_name}
             onChange={handleChange}
             placeholder="Enter your last name"
-            required
+            // required
           />
 
           <Label htmlFor="email">Email</Label>
@@ -116,7 +217,7 @@ const EmployeeRegistrationForm = () => {
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter your email"
-            required
+            // required
           />
 
           <Label htmlFor="joined_date">Joined Date</Label>
@@ -126,7 +227,7 @@ const EmployeeRegistrationForm = () => {
             name="joined_date"
             value={formData.joined_date}
             onChange={handleChange}
-            required
+            // required
           />
 
           <Label htmlFor="nid_card_no">NID Card No</Label>

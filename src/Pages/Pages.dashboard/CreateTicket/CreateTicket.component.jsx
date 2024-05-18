@@ -1,4 +1,4 @@
-import  { useState } from "react"
+import { useState } from "react"
 import {
   Button,
   Container,
@@ -45,27 +45,71 @@ function CreateTicket() {
     )
   }
 
+  // const generateParkingTicket = () => {
+  //   const ticket = {
+  //     // carMake,
+  //     vehicle,
+  //     // phone,
+  //     time_slot,
+  //     // totalAmount,
+  //     // parkingNumber
+  //   }
+
+  //   fetch("https://parkspottermain.pythonanywhere.com/accounts/bookings/", {
+  //     method: "POST",
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //     },
+  //     body: JSON.stringify(ticket),
+  //   })
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error("Failed to create ticket")
+  //       }
+  //       return response.json()
+  //     })
+  //     .then((data) => {
+  //       console.log("Ticket created:", data)
+  //     })
+  //     .catch((error) => {
+  //       console.error("Error creating ticket:", error)
+  //     })
+  // }
+
+  // test
+
   const generateParkingTicket = () => {
-    const ticket = {
-      // carMake,
-      vehicle,
-      // phone,
-      time_slot,
-      // totalAmount,
-      // parkingNumber
+    const token = localStorage.getItem("token")
+
+    if (!token) {
+      console.error("Authentication token not available")
+      return
+    }
+    const user_id = localStorage.getItem("user_id")
+
+    const data = {
+      park_owner_id: user_id,
+      zone: 1,
+      time_slot: 1,
+      vehicle: {
+        plate_number: "ABC123",
+        mobile_no: "1234567890",
+      },
     }
 
     fetch("https://parkspottermain.pythonanywhere.com/accounts/bookings/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Token ${token}`,
       },
-      body: JSON.stringify(ticket),
+      body: JSON.stringify(data),
     })
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to create ticket")
         }
+
         return response.json()
       })
       .then((data) => {
@@ -136,8 +180,5 @@ function CreateTicket() {
 }
 
 export default CreateTicket
-
-
-
 
 // original
