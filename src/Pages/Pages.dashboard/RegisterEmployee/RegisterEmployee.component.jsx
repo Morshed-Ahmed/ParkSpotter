@@ -7,6 +7,9 @@ import {
   Label,
   Title,
 } from "./RegisterEmployee.styled"
+import toast from "react-hot-toast"
+import { registerUser } from "../../../Utils/Firebase/firebase"
+// import createEmployeeUser, { auth, db } from "../../../Utils/Firebase/firebase"
 
 const EmployeeRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -30,113 +33,33 @@ const EmployeeRegistrationForm = () => {
     })
   }
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault()
-
-  //   console.log(formData)
-  // }
-
-  // test
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault()
-
-  //   const userId = localStorage.getItem("user_id")
-  //   const data = {
-  //     "username": "employee",
-  //     "first_name": "Jafor_bhai",
-  //     "last_name": "Sadek",
-  //     "mobile_no": "0909090",
-  //     "qualification": "A+",
-  //     "nid_card_no": "498899",
-  //     "email":"jafor@gmail.com",
-  //     "password":"employee123",
-  //     "confirm_password":"employee123",
-  //     "address": "A/17, Road 6, Eastern Banakunjo 2, Banasree",
-  //     "joined_date": "2024-05-18T23:23:34.469692+06:00",
-  //     "park_owner_id": userId,
-
-  // }
-
-  //   try {
-  //     const token = localStorage.getItem("token")
-
-  //     const response = await fetch(
-  //       "https://parkspottermain.pythonanywhere.com/accounts/employee-register/",
-  //       {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           "Authorization": `Token ${token}`,
-  //         },
-  //         body: JSON.stringify(data),
-  //       }
-  //     )
-
-  //     if (response.status === 404) {
-  //       console.error("Endpoint not found:", response.statusText)
-
-  //       return
-  //     }
-
-  //     const responseData = await response.json()
-  //     console.log("Parsed JSON response:", responseData)
-  //   } catch (error) {
-  //     console.error("Error creating employee:", error)
-  //   }
-  // }
-
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const formData = new FormData(e.target)
-
-    const userId = localStorage.getItem("user_id")
-    const data = {
-      park_owner_id: userId,
-      username: "siyan2",
-      first_name: "Jafor_bhai",
-      last_name: "Sadek",
-      mobile_no: "0000000111",
-      qualification: "A+",
-      nid_card_no: "498899",
-      email: "jafor3@gmail.com",
-      password: "employee123",
-      confirm_password: "employee123",
-      address: "A/17, Road 6, Eastern Banakunjo 2, Banasree",
-      joined_date: "2024-05-18T23:23:34.469692+06:00",
-    }
-
     try {
-      const token = localStorage.getItem("token")
-      if (!token) {
-        console.error("No token found in localStorage")
-        return
-      }
-
-      const response = await fetch(
-        "https://parkspottermain.pythonanywhere.com/accounts/employee-register/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Token ${token}`,
-          },
-          body: JSON.stringify(data),
-        }
-      )
-
-      if (response.status === 404) {
-        console.error("Endpoint not found:", response.statusText)
-        return
-      }
-
-      const responseData = await response.json()
-      console.log("Parsed JSON response:", responseData)
+      await registerUser({
+        ...formData,
+        userType: "employee", // Set the userType to "employee"
+      })
+      toast.success("Employee registered successfully!") // Show success toast
+      setFormData({
+        mobile_no: "",
+        username: "",
+        confirm_password: "",
+        password: "",
+        first_name: "",
+        last_name: "",
+        email: "",
+        joined_date: "",
+        qualification: "",
+        nid_card_no: "",
+        address: "",
+      })
     } catch (error) {
-      console.error("Error creating employee:", error)
+      console.error("Error creating employee:", error.message)
+      toast.error("Failed to register employee. Please try again.") // Show error toast
     }
   }
-
   return (
     <>
       {" "}

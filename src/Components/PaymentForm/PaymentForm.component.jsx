@@ -26,6 +26,7 @@ import {
   StyledPaymentForm,
   StyledPaymentFormContainer,
 } from "./PaymentForm.style"
+import { registerUser } from "../../Utils/Firebase/firebase"
 
 const PaymentForm = () => {
   const stripe = useStripe()
@@ -101,30 +102,20 @@ const PaymentForm = () => {
       alert(`Error: ${paymentResult.error.message}`)
     } else {
       if (paymentResult.paymentIntent.status === "succeeded") {
-        const response = await fetch(
-          "https://parkspottermain.pythonanywhere.com/accounts/register/",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(data),
-          }
-        )
-          .then((response) => {
-            if (!response.ok) {
-              console.error("Error:")
-            }
-            return response.json()
-          })
-          .then((data) => {
-            toast.success(data)
-            navigate("/login")
-          })
-          .catch((error) => {
-            console.error("Error:", error)
-          })
-        console.log(response)
+   
+        data.userType = "parkOwner"
+        // firebase
+        try {
+          // Register the user
+          await registerUser(data)
+          toast.success("User registered successfully")
+          navigate("/login")
+        } catch (error) {
+          console.error("Error registering user:", error)
+          toast.error("Error registering user")
+        }
+        // firebase
+
         alert("Payment Success")
       }
     }
@@ -176,6 +167,5 @@ const PaymentForm = () => {
 }
 
 export default PaymentForm
-
 
 // comment

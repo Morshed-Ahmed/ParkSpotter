@@ -1,73 +1,91 @@
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { Container, Header, Form, Loader } from "./SingIn.styles";
-import toast from "react-hot-toast";
-import { useState } from "react";
+// SignIn.js
+
+import { useState } from "react"
+import { useForm } from "react-hook-form"
+import { Link, useNavigate } from "react-router-dom"
+import toast from "react-hot-toast"
+import {
+  auth,
+  loginUserWithEmailAndPassword,
+} from "../../../Utils/Firebase/firebase"
+import { Container, Header, Loader, Form } from "./SingIn.styles"
+import { useDispatch } from "react-redux"
+import { fetchUserType } from "../../../store/user/user.thunks"
 
 const SignIn = () => {
-  const navigate = useNavigate();
-  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
   const {
     register,
     formState: { errors },
     handleSubmit,
-  } = useForm();
+  } = useForm()
+
+  const [userAuth, setUserAuth] = useState(null)
+
+  const dispatch = useDispatch()
 
   const onSubmit = async (data) => {
-    setLoading(true);
+    setLoading(true)
 
     try {
-      const response = await fetch(
-        "https://parkspottermain.pythonanywhere.com/accounts/user_login/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        }
-      );
+      const user = await loginUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      )
+      setUserAuth(user)
+      toast.success("Login successful")
 
-      const responseData = await response.json();
-      console.log(responseData);
-
-      if (responseData.error) {
-        toast.error("Invalid credentials");
-        setLoading(false);
-        throw new Error("Invalid credentials");
+      try {
+        dispatch(fetchUserType())
+      } catch (error) {
+        console.error("Error fetching user type:", error.message)
+        // Handle errors during user type fetching (optional: display a message)
       }
-      if (responseData.is_staff) {
-        localStorage.setItem("is_staff", responseData.is_staff);
-      }
-      localStorage.setItem("token", responseData.token);
-      localStorage.setItem("user_id", responseData.user_id);
-      // localStorage.setItem("detail", responseData.detail);
-
-      navigate("/dashboard");
-      toast.success("Login successful");
-      setLoading(false);
+      navigate("/dashboard")
     } catch (error) {
-      toast.error("Invalid credentials");
-      setLoading(false);
+      if (
+        error.message.includes(
+          "Login failed: Email verification required. Please check your inbox."
+        )
+      ) {
+        toast.error("Email verification required. Please check your inbox.")
+      } else {
+        toast.error("Invalid email or password.")
+      }
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <div>
       <Link to={"/"}>
-        <button style={{ margin: "10px", padding: "10px", backgroundColor: "#202123", color: "#ffffff", border: "none", borderRadius: "4px", cursor: "pointer" }}>Home</button>
+        <button
+          style={{
+            margin: "10px",
+            padding: "10px",
+            backgroundColor: "#202123",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Home
+        </button>
       </Link>
       <Container>
         <Header>Sign in</Header>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <input
-            placeholder="Username"
-            type="text"
-            {...register("username", { required: true })}
-            aria-invalid={errors.username ? "true" : "false"}
+            placeholder="Email"
+            type="email"
+            {...register("email", { required: true })}
+            aria-invalid={errors.email ? "true" : "false"}
           />
-          {errors.username?.type === "required" && (
-            <p role="alert">Username is required</p>
+          {errors.email?.type === "required" && (
+            <p role="alert">Email is required</p>
           )}
 
           <input
@@ -78,11 +96,7 @@ const SignIn = () => {
           />
           {errors.password && <p role="alert">{errors.password?.message}</p>}
 
-          {loading ? (
-            <Loader />
-          ) : (
-            <input type="submit" value={"Sign In"} />
-          )}
+          {loading ? <Loader /> : <input type="submit" value={"Sign In"} />}
 
           <p>
             Don&apos;t have an account? <Link to={"/signup"}>Sign Up</Link>
@@ -90,7 +104,7 @@ const SignIn = () => {
         </Form>
       </Container>
     </div>
-  );
-};
+  )
+}
 
-export default SignIn;
+export default SignIn

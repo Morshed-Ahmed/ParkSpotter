@@ -18,6 +18,8 @@ import {
   Image,
 } from "./DashBoardRoutes.styles"
 import UserProfile from "../Pages/Pages.UserProfile/UserProfile/UserProfile"
+import { useSelector } from "react-redux"
+import { selectUserType } from "../store/user/user.selector"
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true)
@@ -34,6 +36,8 @@ const Dashboard = () => {
   }
   /* Profile Dropdown end */
 
+  const userType = useSelector(selectUserType) // Fetch userType directly from Redux store
+  console.log(userType)
   return (
     <Container>
       <Header>
@@ -73,9 +77,11 @@ const Dashboard = () => {
             Available Parking Slot
           </MenuItem>
           <MenuItem to={"/dashboard/UnpaidTickets"}>Unpaid tickets</MenuItem>
-          <MenuItem to={"/dashboard/RegisterEmployee"}>
-            Register Employee
-          </MenuItem>
+          {userType === "parkOwner" && (
+            <MenuItem to={"/dashboard/RegisterEmployee"}>
+              Register Employee
+            </MenuItem>
+          )}
         </MenuContainer>
         <OutletWrapper>
           <Outlet />

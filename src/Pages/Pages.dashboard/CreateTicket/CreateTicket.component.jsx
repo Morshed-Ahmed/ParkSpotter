@@ -11,6 +11,8 @@ import {
   TotalAmount,
   WarningMessage,
 } from "./CreateTicket.styled"
+import { storeParkingTicket } from "../../../Utils/Firebase/firebase"
+import toast from "react-hot-toast"
 
 function CreateTicket() {
   const [carMake, setCarMake] = useState("")
@@ -45,84 +47,35 @@ function CreateTicket() {
     )
   }
 
-  // const generateParkingTicket = () => {
-  //   const ticket = {
-  //     // carMake,
-  //     vehicle,
-  //     // phone,
-  //     time_slot,
-  //     // totalAmount,
-  //     // parkingNumber
-  //   }
-
-  //   fetch("https://parkspottermain.pythonanywhere.com/accounts/bookings/", {
-  //     method: "POST",
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //     },
-  //     body: JSON.stringify(ticket),
-  //   })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Failed to create ticket")
-  //       }
-  //       return response.json()
-  //     })
-  //     .then((data) => {
-  //       console.log("Ticket created:", data)
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error creating ticket:", error)
-  //     })
-  // }
-
-  // test
-
-  const generateParkingTicket = () => {
-    const token = localStorage.getItem("token")
-
-    if (!token) {
-      console.error("Authentication token not available")
-      return
+  // Function to handle form submission and store parking ticket data
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const ticketData = {
+        carMake,
+        vehicle,
+        phone,
+        time_slot,
+        totalAmount,
+        parkingNumber,
+      }
+      const ticketId = await storeParkingTicket(ticketData)
+      toast.success("Ticket created with ID: ", ticketId)
+      // Clear form fields after successful ticket creation
+      setCarMake("")
+      setVehicle("")
+      setPhone("")
+      setTime_slot("")
+      setTotalAmount(0)
+      setWarningMessage("")
+    } catch (error) {
+      toast.error("Error creating ticket:", error.message)
+      // Handle error (e.g., display error message to the user)
     }
-    const user_id = localStorage.getItem("user_id")
-
-    const data = {
-      park_owner_id: user_id,
-      zone: 1,
-      time_slot: 1,
-      vehicle: {
-        plate_number: "ABC123",
-        mobile_no: "1234567890",
-      },
-    }
-
-    fetch("https://parkspottermain.pythonanywhere.com/accounts/bookings/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Token ${token}`,
-      },
-      body: JSON.stringify(data),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to create ticket")
-        }
-
-        return response.json()
-      })
-      .then((data) => {
-        console.log("Ticket created:", data)
-      })
-      .catch((error) => {
-        console.error("Error creating ticket:", error)
-      })
   }
 
   return (
     <>
-      {" "}
       <Title>Create Ticket</Title>
       <Container>
         <FormGroup>
@@ -173,12 +126,10 @@ function CreateTicket() {
           Parking Number: {parkingNumber}
         </StaticParkingNumber>
         {warningMessage && <WarningMessage>{warningMessage}</WarningMessage>}
-        <Button onClick={generateParkingTicket}>Generate Parking Ticket</Button>
+        <Button onClick={handleSubmit}>Generate Parking Ticket</Button>
       </Container>
     </>
   )
 }
 
 export default CreateTicket
-
-// original
