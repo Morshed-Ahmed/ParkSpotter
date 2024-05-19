@@ -1,4 +1,3 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app"
 import {
   createUserWithEmailAndPassword,
@@ -37,7 +36,6 @@ const db = getFirestore(app)
 export const registerUser = async (userData) => {
   // eslint-disable-next-line no-useless-catch
   try {
-    // 1. Create user with email and password
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       userData.email,
@@ -45,55 +43,49 @@ export const registerUser = async (userData) => {
     )
     const user = userCredential.user
 
-    // 2. Send email verification
     await sendEmailVerification(user)
 
-    // 3. Prepare user data with the required "userType" field
     const updatedUserData = {
-      ...userData, // Spread existing user data
-      userType: userData.userType || "default", // Default to "default" if not provided
+      ...userData, 
+      userType: userData.userType || "default", 
     }
 
-    // 4. Determine the collection based on userType and add user data to Firestore
     let collectionName
     if (updatedUserData.userType === "parkOwner") {
       collectionName = "park_owners"
     } else if (updatedUserData.userType === "employee") {
       collectionName = "employees"
     } else {
-      collectionName = "default_collection" // You can specify a default collection name
+      collectionName = "default_collection" 
     }
 
     const userRef = await addDoc(collection(db, collectionName), {
       ...updatedUserData,
-      uid: user.uid, // Ensure user UID is also stored
+      uid: user.uid, 
     })
 
-    return userRef.id // Return the document ID
+    return userRef.id 
   } catch (error) {
-    throw error // Throw any errors encountered
+    throw error 
   }
 }
 
 export const loginUserWithEmailAndPassword = async (auth, email, password) => {
   try {
-    // 1. Attempt sign-in with email and password
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
       password
     )
 
-    // 2. Check if email verification is complete
     if (!userCredential.user.emailVerified) {
       throw new Error("Email verification required. Please check your inbox.")
     }
 
-    // 3. Return the verified user if email is verified
     return userCredential.user
   } catch (error) {
     console.error("Error logging in:", error.message)
-    throw new Error("Login failed: " + error.message) // Re-throw error for handling
+    throw new Error("Login failed: " + error.message) 
   }
 }
 
@@ -103,17 +95,14 @@ export const getCurrentUser = (auth) => {
 
 export const getUserType = async () => {
   try {
-    // 1. Get the currently logged-in user
     const user = auth.currentUser
 
-    // 2. Check if a user is logged in
     if (!user) {
       throw new Error("No user logged in")
     }
 
     const userId = user.uid
 
-    // 3. Query park_owners collection for matching user ID
     const parkOwnersQuery = query(
       collection(db, "park_owners"),
       where("uid", "==", userId)
@@ -122,10 +111,9 @@ export const getUserType = async () => {
 
     if (!parkOwnersSnapshot.empty) {
       const parkOwnerData = parkOwnersSnapshot.docs[0].data()
-      return parkOwnerData.userType // Assuming "userType" exists in park owner data
+      return parkOwnerData.userType 
     }
 
-    // 4. Query employees collection for matching user ID
     const employeesQuery = query(
       collection(db, "employees"),
       where("uid", "==", userId)
@@ -134,25 +122,24 @@ export const getUserType = async () => {
 
     if (!employeesSnapshot.empty) {
       const employeeData = employeesSnapshot.docs[0].data()
-      return employeeData.userType // Assuming "userType" exists in employee data
+      return employeeData.userType 
     }
 
     throw new Error("User not found in park owners or employees collections")
   } catch (error) {
     console.error("Error fetching user type:", error.message)
-    return null // Or throw an error if you prefer
+    return null 
   }
 }
 
 export const storeParkingTicket = async (ticketData) => {
   try {
-    // Add a new document with auto-generated ID to the "parking_tickets" collection
     const docRef = await addDoc(collection(db, "parking_tickets"), ticketData)
     console.log("Ticket created with ID: ", docRef.id)
-    return docRef.id // Return the ID of the created document
+    return docRef.id 
   } catch (error) {
     console.error("Error creating ticket:", error.message)
-    throw error // Throw any errors encountered
+    throw error 
   }
 }
 
@@ -188,39 +175,33 @@ export const fetchAllParkingTickets = async () => {
 
 export const deleteAndStoreParkingTicket = async (ticketId) => {
   try {
-    // Get a reference to the ticket document
     const ticketDocRef = doc(db, "parking_tickets", ticketId)
 
-    // Attempt to retrieve the ticket data with a timeout
-    const ticketSnap = await getDoc(ticketDocRef, { timeout: 10000 }) // Timeout in milliseconds
+    const ticketSnap = await getDoc(ticketDocRef, { timeout: 10000 }) 
 
-    // Check if the document exists and timed out
     if (!ticketSnap.exists || ticketSnap.timedOut) {
       console.warn("Ticket not found or timed out:", ticketId)
-      return // Exit if ticket not found or timed out
+      return 
     }
 
     const ticketData = ticketSnap.data()
 
-    // Check if ticketData is valid
     if (!ticketData) {
       console.warn("Invalid ticket data:", ticketId)
-      return // Exit if ticketData is invalid
+      return 
     }
 
-    // Store ticket data in "paid_parking_tickets" collection (use addDoc for auto-generated ID)
     const paidTicketRef = await addDoc(
       collection(db, "paid_parking_tickets"),
       ticketData
     )
 
-    // Delete the ticket from "parking_tickets" collection
     await deleteDoc(ticketDocRef)
 
     console.log("Ticket stored and deleted successfully.")
   } catch (error) {
     console.error("Error deleting and storing ticket:", error.message)
-    throw error // Re-throw for error handling
+    throw error 
   }
 }
 
