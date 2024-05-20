@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { Outlet } from "react-router-dom"
+import { Outlet, useNavigate } from "react-router-dom"
 import {
   Container,
   Content,
@@ -20,6 +20,8 @@ import {
 import UserProfile from "../Pages/Pages.UserProfile/UserProfile/UserProfile"
 import { useSelector } from "react-redux"
 import { selectUserType } from "../store/user/user.selector"
+import { logoutUser } from "../Utils/Firebase/firebase"
+import toast from "react-hot-toast"
 
 const Dashboard = () => {
   const [menuOpen, setMenuOpen] = useState(true)
@@ -33,6 +35,19 @@ const Dashboard = () => {
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen)
+  }
+
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser()
+      toast.success("log out success")
+      navigate("/login") // Navigate to the login page after logout
+      
+    } catch (error) {
+      toast.error("Error logging out:", error.message)
+    }
   }
   /* Profile Dropdown end */
 
@@ -62,7 +77,7 @@ const Dashboard = () => {
           <DropdownContent isOpen={isOpen}>
             {/* <DropdownItem>Profile</DropdownItem> */}
             <UserProfile />
-            <DropdownItem>Log Out</DropdownItem>
+            <DropdownItem onClick={handleLogout}>Log Out</DropdownItem>
           </DropdownContent>
         </DropdownContainer>
         {/* Profile Dropdown End */}
@@ -82,6 +97,9 @@ const Dashboard = () => {
               Register Employee
             </MenuItem>
           )}
+          <MenuItem to={"/dashboard/test"}>
+            test
+          </MenuItem>
         </MenuContainer>
         <OutletWrapper>
           <Outlet />

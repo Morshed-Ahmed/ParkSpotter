@@ -20,6 +20,7 @@ export const selectPassword = (state) => selectRegistrationSlice(state).password
 export const selectSlotSize = (state) =>
   selectRegistrationSlice(state).slot_size
 export const selectUsername = (state) => selectRegistrationSlice(state).username
+export const selectZones = (state) => selectRegistrationSlice(state).zones
 
 export const selectAddressMemoized = createSelector(
   selectAddress,
@@ -74,3 +75,54 @@ export const selectUsernameMemoized = createSelector(
   selectUsername,
   (username) => username
 )
+
+export const selectZonesMemoized = createSelector(
+  selectZones,
+  (zones) => zones
+)
+
+
+export const selectAllStates = createSelector(
+  selectAddress,
+  selectArea,
+  selectCapacity,
+  selectConfirmPassword,
+  selectEmail,
+  selectFirstName,
+  selectLastName,
+  selectMobileNo,
+  selectNidCardNo,
+  selectPassword,
+  selectSlotSize,
+  selectUsername,
+  selectZones,
+  (
+    address,
+    area,
+    capacity,
+    confirmPassword,
+    email,
+    firstName,
+    lastName,
+    mobileNo,
+    nidCardNo,
+    password,
+    slotSize,
+    username,
+    zones
+  ) => ({
+    address,
+    area,
+    capacity,
+    confirmPassword,
+    email,
+    firstName,
+    lastName,
+    mobileNo,
+    nidCardNo,
+    password,
+    slotSize,
+    username,
+    zones,
+  })
+);

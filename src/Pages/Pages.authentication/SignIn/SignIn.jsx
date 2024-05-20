@@ -7,6 +7,7 @@ import toast from "react-hot-toast"
 import {
   auth,
   loginUserWithEmailAndPassword,
+  logoutUser,
 } from "../../../Utils/Firebase/firebase"
 import { Container, Header, Loader, Form } from "./SingIn.styles"
 import { useDispatch } from "react-redux"
@@ -25,10 +26,19 @@ const SignIn = () => {
 
   const dispatch = useDispatch()
 
+
   const onSubmit = async (data) => {
     setLoading(true)
 
     try {
+      // Check if a user is already logged in
+      if (auth.currentUser) {
+        await logoutUser()
+        toast.error("Previous user logged out. Please try signing in again.")
+        setLoading(false)
+        return
+      }
+
       const user = await loginUserWithEmailAndPassword(
         auth,
         data.email,

@@ -4,6 +4,7 @@ import {
   getAuth,
   signInWithEmailAndPassword,
   sendEmailVerification,
+  signOut,
 } from "firebase/auth"
 
 import {
@@ -34,8 +35,14 @@ const auth = getAuth(app)
 const db = getFirestore(app)
 
 export const registerUser = async (userData) => {
-  // eslint-disable-next-line no-useless-catch
+  const auth = getAuth()
+
+  const currentUser = auth.currentUser
   try {
+    if (!currentUser) {
+      throw new Error("No user is currently logged in.")
+    }
+
     const userCredential = await createUserWithEmailAndPassword(
       auth,
       userData.email,
@@ -46,32 +53,45 @@ export const registerUser = async (userData) => {
     await sendEmailVerification(user)
 
     const updatedUserData = {
-      ...userData, 
-      userType: userData.userType || "default", 
+      ...userData,
+      userType: userData.userType || "default",
+      uid: user.uid, // Ensure the UID is included in the user data
     }
 
     let collectionName
+    let userRef
+
     if (updatedUserData.userType === "parkOwner") {
       collectionName = "park_owners"
+      // Set the document ID to be the same as the user's UID
+      userRef = doc(db, collectionName, user.uid)
+      await setDoc(userRef, updatedUserData)
     } else if (updatedUserData.userType === "employee") {
       collectionName = "employees"
+      // Set the parkOwnerId to the current user's UID
+      updatedUserData.parkOwnerId = currentUser.uid
+      // Add the employee data to the employees collection
+      userRef = await addDoc(collection(db, collectionName), updatedUserData)
     } else {
-      collectionName = "default_collection" 
+      collectionName = "default_collection"
+      userRef = await addDoc(collection(db, collectionName), updatedUserData)
     }
 
-    const userRef = await addDoc(collection(db, collectionName), {
-      ...updatedUserData,
-      uid: user.uid, 
-    })
-
-    return userRef.id 
+    return userRef.id
   } catch (error) {
-    throw error 
+    console.error("Error creating user:", error.message)
+    throw error
   }
 }
 
 export const loginUserWithEmailAndPassword = async (auth, email, password) => {
   try {
+    // Check if a user is already logged in
+    if (auth.currentUser) {
+      await signOut(auth)
+      console.info("Previous user logged out. Proceeding with new login.")
+    }
+
     const userCredential = await signInWithEmailAndPassword(
       auth,
       email,
@@ -85,7 +105,7 @@ export const loginUserWithEmailAndPassword = async (auth, email, password) => {
     return userCredential.user
   } catch (error) {
     console.error("Error logging in:", error.message)
-    throw new Error("Login failed: " + error.message) 
+    throw new Error("Login failed: " + error.message)
   }
 }
 
@@ -111,7 +131,7 @@ export const getUserType = async () => {
 
     if (!parkOwnersSnapshot.empty) {
       const parkOwnerData = parkOwnersSnapshot.docs[0].data()
-      return parkOwnerData.userType 
+      return parkOwnerData.userType
     }
 
     const employeesQuery = query(
@@ -122,13 +142,13 @@ export const getUserType = async () => {
 
     if (!employeesSnapshot.empty) {
       const employeeData = employeesSnapshot.docs[0].data()
-      return employeeData.userType 
+      return employeeData.userType
     }
 
     throw new Error("User not found in park owners or employees collections")
   } catch (error) {
     console.error("Error fetching user type:", error.message)
-    return null 
+    return null
   }
 }
 
@@ -136,10 +156,10 @@ export const storeParkingTicket = async (ticketData) => {
   try {
     const docRef = await addDoc(collection(db, "parking_tickets"), ticketData)
     console.log("Ticket created with ID: ", docRef.id)
-    return docRef.id 
+    return docRef.id
   } catch (error) {
     console.error("Error creating ticket:", error.message)
-    throw error 
+    throw error
   }
 }
 
@@ -177,18 +197,18 @@ export const deleteAndStoreParkingTicket = async (ticketId) => {
   try {
     const ticketDocRef = doc(db, "parking_tickets", ticketId)
 
-    const ticketSnap = await getDoc(ticketDocRef, { timeout: 10000 }) 
+    const ticketSnap = await getDoc(ticketDocRef, { timeout: 10000 })
 
     if (!ticketSnap.exists || ticketSnap.timedOut) {
       console.warn("Ticket not found or timed out:", ticketId)
-      return 
+      return
     }
 
     const ticketData = ticketSnap.data()
 
     if (!ticketData) {
       console.warn("Invalid ticket data:", ticketId)
-      return 
+      return
     }
 
     const paidTicketRef = await addDoc(
@@ -201,8 +221,112 @@ export const deleteAndStoreParkingTicket = async (ticketId) => {
     console.log("Ticket stored and deleted successfully.")
   } catch (error) {
     console.error("Error deleting and storing ticket:", error.message)
-    throw error 
+    throw error
   }
 }
+
+export const logoutUser = async () => {
+  try {
+    await signOut(auth)
+    console.log("User logged out successfully.")
+  } catch (error) {
+    console.error("Error logging out:", error.message)
+    throw error
+  }
+}
+
+export const fetchParkingSlots = async () => {
+  try {
+    const auth = getAuth()
+    const currentUser = auth.currentUser
+
+    if (!currentUser) {
+      console.log("No user is currently logged in.")
+      return null
+    }
+
+    // Get employee document reference using currentUser.uid
+    const userDocRef = doc(db, "employees", currentUser.uid)
+
+    // Fetch employee document
+    const userSnapshot = await getDoc(userDocRef)
+
+    // Check if document exists
+    if (userSnapshot.exists()) {
+      const userData = userSnapshot.data()
+
+      // Log userData to debug
+      console.log("Fetched user data:", userData)
+
+      if (!userData || !userData.parkOwnerId) {
+        console.log(
+          "User data does not contain parkOwnerId or userData is undefined."
+        )
+        return null
+      }
+
+      const parkOwnerId = userData.parkOwnerId
+
+      // If parkOwnerId exists, search for zone data in parkOwner collection
+      const parkOwnerDocRef = doc(db, "park_owners", parkOwnerId)
+
+      const parkOwnerSnapshot = await getDoc(parkOwnerDocRef)
+
+      if (parkOwnerSnapshot.exists()) {
+        const parkOwnerData = parkOwnerSnapshot.data()
+
+        // Log parkOwnerData to debug
+        console.log("Fetched park owner data:", parkOwnerData)
+
+        const zoneData = parkOwnerData.zones || {} // Handle potential absence of zoneData
+
+        // Function to convert zones data to parkingSlots array
+        const convertZonesToParkingSlots = (zones) => {
+          const parkingSlots = []
+
+          for (const [zone, slots] of Object.entries(zones)) {
+            slots.forEach((slot) => {
+              parkingSlots.push({
+                zone: zone.replace("Zone ", ""), // Remove "Zone " prefix for numeric zones
+                slot: slot.id,
+                available: slot.available,
+              })
+            })
+          }
+
+          return parkingSlots
+        }
+
+        // Convert zoneData to the expected parkingSlots format
+        const parkingSlots = convertZonesToParkingSlots(zoneData)
+
+        // Return the flattened parking slots data
+        return parkingSlots
+      } else {
+        console.log("No park owner document found for:", parkOwnerId)
+      }
+    } else {
+      console.log("No user document found for:", currentUser.uid)
+      return null // Or handle differently based on your requirements
+    }
+  } catch (error) {
+    console.error("Error fetching user data:", error.message)
+    throw new Error("Failed to fetch user data: " + error.message)
+  }
+}
+
+// export const fetchParkingSlots = async () => {
+//   try {
+//     const querySnapshot = await getDocs(collection(db, "parkingSlots"))
+//     const parkingSlots = []
+//     querySnapshot.forEach((doc) => {
+//       parkingSlots.push({ id: doc.id, ...doc.data() })
+//     })
+//     return parkingSlots
+//   } catch (error) {
+//     console.error("Error fetching parking slots:", error.message)
+//     throw new Error("Failed to fetch parking slots: " + error.message)
+//   }
+// }
 
 export { auth, db }

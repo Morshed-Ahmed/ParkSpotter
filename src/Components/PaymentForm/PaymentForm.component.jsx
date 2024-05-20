@@ -1,19 +1,7 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
 import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import {
-  selectAddress,
-  selectArea,
-  selectCapacity,
-  selectConfirmPassword,
-  selectEmail,
-  selectFirstName,
-  selectLastName,
-  selectMobileNo,
-  selectPassword,
-  selectSlotSize,
-  selectUsername,
-} from "../../store/registration/registration.selector"
+import { selectAllStates } from "../../store/registration/registration.selector"
 import { selectSubscriptionAmount } from "../../store/payment/payment.selector"
 import { setPaymentType } from "../../store/payment/payment.reducer"
 import toast from "react-hot-toast"
@@ -36,32 +24,13 @@ const PaymentForm = () => {
   const amount = useSelector(selectSubscriptionAmount)
   const navigate = useNavigate()
 
-  const currentUser = {
-    userName: useSelector(selectUsername),
-    phone: useSelector(selectMobileNo),
-    email: useSelector(selectEmail),
-    address: useSelector(selectAddress),
-  }
+  // Get all registration data using the selectRegistrationSlice selector
+  const registrationData = useSelector(selectAllStates)
 
+  // Dispatch an action to set the payment type
   dispatch(setPaymentType("stripe"))
 
-  const data = {}
-  data.address = useSelector(selectAddress)
-  data.amount = useSelector(selectSubscriptionAmount)
-  data.area = useSelector(selectArea)
-  data.capacity = useSelector(selectCapacity)
-  data.confirm_password = useSelector(selectConfirmPassword)
-  data.email = useSelector(selectEmail)
-  data.first_name = useSelector(selectFirstName)
-  data.last_name = useSelector(selectLastName)
-  data.mobile_no = useSelector(selectMobileNo)
-  data.nid_card_no = 12345678901
-  data.password = useSelector(selectPassword)
-  data.payment_date = "2024-05-11"
-  data.payment_method = "stripe"
-  data.slot_size = useSelector(selectSlotSize)
-  data.username = useSelector(selectUsername)
-
+  // Define the payment handler function
   const paymentHandler = async (e, data) => {
     e.preventDefault()
 
@@ -69,7 +38,10 @@ const PaymentForm = () => {
       return
     }
 
+    // Set processing payment state to true
     setIsProcessingPayment(true)
+
+    // Fetch the payment intent
     const response = await fetch("/.netlify/functions/create-payment-intent", {
       method: "post",
       headers: {
@@ -78,54 +50,59 @@ const PaymentForm = () => {
       body: JSON.stringify({ amount: amount * 100 }),
     }).then((res) => res.json())
 
+    // Extract client secret from the response
     const {
       paymentIntent: { client_secret },
     } = response
 
+    // Confirm card payment with stripe
     const paymentResult = await stripe.confirmCardPayment(client_secret, {
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
-          name: currentUser ? currentUser.userName : "Guest",
+          name: registrationData.username || "Guest",
           address: {
-            line1: currentUser ? currentUser.address : "N/A",
+            line1: registrationData.address || "N/A",
           },
-          phone: currentUser ? currentUser.phone : "N/A",
-          email: currentUser ? currentUser.email : "N/A",
+          phone: registrationData.mobile_no || "N/A",
+          email: registrationData.email || "N/A",
         },
       },
     })
 
+    // Set processing payment state to false
     setIsProcessingPayment(false)
 
+    // Handle payment result
     if (paymentResult.error) {
       alert(`Error: ${paymentResult.error.message}`)
     } else {
       if (paymentResult.paymentIntent.status === "succeeded") {
-   
-        data.userType = "parkOwner"
-        // firebase
+        // Set user type
+        registrationData.userType = "parkOwner"
+
+        // Register the user
         try {
-          // Register the user
-          await registerUser(data)
+          await registerUser(registrationData)
           toast.success("User registered successfully")
           navigate("/login")
         } catch (error) {
           console.error("Error registering user:", error)
           toast.error("Error registering user")
         }
-        // firebase
 
+        // Payment success alert
         alert("Payment Success")
       }
     }
   }
 
+  // Render the component
   return (
     <StyledPaymentFormContainer>
       <StyledPaymentForm>
         <StyledHeading>Secure Payment</StyledHeading>
-        <StyledForm onSubmit={(e) => paymentHandler(e, data)}>
+        <StyledForm onSubmit={(e) => paymentHandler(e, registrationData)}>
           <div>
             <StyledLabel htmlFor="card-element">
               Credit Card Information
@@ -167,5 +144,3 @@ const PaymentForm = () => {
 }
 
 export default PaymentForm
-
-// comment

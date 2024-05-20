@@ -13,6 +13,8 @@ const REGISTRATION_INITIAL_STATE = {
   password: null,
   slot_size: null,
   username: null,
+  // New fields for zone registration
+  zones: [],
 }
 
 const registrationSlice = createSlice({
@@ -25,10 +27,16 @@ const registrationSlice = createSlice({
         ...action.payload,
       }
     },
+    setZoneRegistrationField: (state, action) => {
+      state.zones.push(action.payload)
+    },
     clearRegistrationFields: () => REGISTRATION_INITIAL_STATE,
   },
 })
 
-export const { setRegistrationField, clearRegistrationFields } =
-  registrationSlice.actions
+export const {
+  setRegistrationField,
+  setZoneRegistrationField,
+  clearRegistrationFields,
+} = registrationSlice.actions
 export const registrationReducer = registrationSlice.reducer

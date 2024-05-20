@@ -1,4 +1,4 @@
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { useForm } from "react-hook-form"
 import { Link, useNavigate } from "react-router-dom"
 import {
@@ -25,11 +25,52 @@ const SignUp = () => {
   const dispatch = useDispatch()
   password.current = watch("password", "")
 
-  const onSubmit = (data) => {
-    data.nid_card_no = 12345678901
-    dispatch(setRegistrationField(data))
+  const [zoneCount, setZoneCount] = useState(0)
 
-    navigate("/payment")
+  const onSubmit = (data) => {
+    const zones = {};
+    for (let i = 1; i <= zoneCount; i++) {
+      const parkingLotsKey = `parking_lots_${i}`;
+      const parkingLots = data[parkingLotsKey] || 0;
+      const slots = Array.from({ length: parkingLots }, (_, index) => ({
+        id: `Slot ${index + 1}`,
+        available: true,
+      }));
+      zones[`Zone ${i}`] = { slots };
+      delete data[parkingLotsKey];
+    }
+    data.nid_card_no = 12345678901;
+    data.zones = zones;
+    console.log(data);
+    dispatch(setRegistrationField(data));
+    navigate("/payment");
+  }
+
+  const renderParkingLotsInputFields = () => {
+    const parkingLotsInputFields = []
+    for (let i = 1; i <= zoneCount; i++) {
+      parkingLotsInputFields.push(
+        <InputContainer key={i}>
+          <input
+            style={{
+              padding: "10px",
+              borderRadius: "5px",
+              width: "100%",
+            }}
+            placeholder={`Number of Parking Lots for Zone ${i}`}
+            type="number"
+            {...register(`parking_lots_${i}`, { required: false })}
+            aria-invalid={errors[`parking_lots_${i}`] ? "true" : "false"}
+          />
+          {errors[`parking_lots_${i}`]?.type === "required" && (
+            <p role="alert" style={{ color: "coral" }}>
+              Number of parking lots is required for Zone {i}
+            </p>
+          )}
+        </InputContainer>
+      )
+    }
+    return parkingLotsInputFields
   }
 
   return (
@@ -81,7 +122,7 @@ const SignUp = () => {
               }}
               placeholder="Create a username"
               type="text"
-              {...register("username", { required: true })}
+              {...register("username", { required: false })}
               aria-invalid={errors.username ? "true" : "false"}
             />
             {errors.username?.type === "required" && (
@@ -100,7 +141,7 @@ const SignUp = () => {
                 }}
                 placeholder="First name"
                 type="text"
-                {...register("first_name", { required: true })}
+                {...register("first_name", { required: false })}
                 aria-invalid={errors.first_name ? "true" : "false"}
               />
               {errors.first_name?.type === "required" && (
@@ -118,7 +159,7 @@ const SignUp = () => {
                 }}
                 placeholder="Last name"
                 type="text"
-                {...register("last_name", { required: true })}
+                {...register("last_name", { required: false })}
                 aria-invalid={errors.last_name ? "true" : "false"}
               />
               {errors.last_name?.type === "required" && (
@@ -138,7 +179,7 @@ const SignUp = () => {
                 }}
                 placeholder="Email address"
                 type="email"
-                {...register("email", { required: true })}
+                {...register("email", { required: false })}
                 aria-invalid={errors.email ? "true" : "false"}
               />
               {errors.email?.type === "required" && (
@@ -156,7 +197,7 @@ const SignUp = () => {
                 }}
                 placeholder="Phone number"
                 type="text"
-                {...register("mobile_no", { required: true })}
+                {...register("mobile_no", { required: false })}
                 aria-invalid={errors.mobile_no ? "true" : "false"}
               />
               {errors.mobile_no?.type === "required" && (
@@ -241,7 +282,7 @@ const SignUp = () => {
                 }}
                 placeholder="Slot size"
                 type="number"
-                {...register("slot_size", { required: true })}
+                {...register("slot_size", { required: false })}
                 aria-invalid={errors.slot_size ? "true" : "false"}
               />
               {errors.slot_size?.type === "required" && (
@@ -259,7 +300,7 @@ const SignUp = () => {
                 }}
                 placeholder="Capacity"
                 type="number"
-                {...register("capacity", { required: true })}
+                {...register("capacity", { required: false })}
                 aria-invalid={errors.capacity ? "true" : "false"}
               />
               {errors.capacity?.type === "required" && (
@@ -269,6 +310,28 @@ const SignUp = () => {
               )}
             </InputContainer>
           </FlexContainer>
+          <FullWidthInputBox>
+            <input
+              style={{
+                padding: "10px",
+                borderRadius: "5px",
+                width: "100%",
+              }}
+              placeholder="Number of Parking Zones"
+              type="number"
+              min="0"
+              {...register("zoneCount", { required: false })}
+              aria-invalid={errors.zoneCount ? "true" : "false"}
+              onChange={(e) => setZoneCount(parseInt(e.target.value))}
+            />
+            {errors.zoneCount?.type === "required" && (
+              <p role="alert" style={{ color: "coral" }}>
+                Number of zones is required
+              </p>
+            )}
+          </FullWidthInputBox>
+
+          {renderParkingLotsInputFields()}
 
           <FlexContainer style={{ display: "flex", gap: "10px" }}>
             <InputContainer>
@@ -281,7 +344,7 @@ const SignUp = () => {
                 }}
                 placeholder="Address"
                 rows="3"
-                {...register("address", { required: true })}
+                {...register("address", { required: false })}
                 aria-invalid={errors.address ? "true" : "false"}
               />
               {errors.address?.type === "required" && (
@@ -300,7 +363,7 @@ const SignUp = () => {
                 }}
                 placeholder="Area"
                 rows="3"
-                {...register("area", { required: true })}
+                {...register("area", { required: false })}
                 aria-invalid={errors.area ? "true" : "false"}
               />
               {errors.area?.type === "required" && (
