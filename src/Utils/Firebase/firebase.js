@@ -55,7 +55,7 @@ export const registerUser = async (userData) => {
     const updatedUserData = {
       ...userData,
       userType: userData.userType || "default",
-      uid: user.uid, // Ensure the UID is included in the user data
+      uid: user.uid, 
     }
 
     let collectionName
@@ -63,14 +63,11 @@ export const registerUser = async (userData) => {
 
     if (updatedUserData.userType === "parkOwner") {
       collectionName = "park_owners"
-      // Set the document ID to be the same as the user's UID
       userRef = doc(db, collectionName, user.uid)
       await setDoc(userRef, updatedUserData)
     } else if (updatedUserData.userType === "employee") {
       collectionName = "employees"
-      // Set the parkOwnerId to the current user's UID
       updatedUserData.parkOwnerId = currentUser.uid
-      // Add the employee data to the employees collection
       userRef = await addDoc(collection(db, collectionName), updatedUserData)
     } else {
       collectionName = "default_collection"
@@ -86,7 +83,6 @@ export const registerUser = async (userData) => {
 
 export const loginUserWithEmailAndPassword = async (auth, email, password) => {
   try {
-    // Check if a user is already logged in
     if (auth.currentUser) {
       await signOut(auth)
       console.info("Previous user logged out. Proceeding with new login.")
@@ -245,17 +241,13 @@ export const fetchParkingSlots = async () => {
       return null
     }
 
-    // Get employee document reference using currentUser.uid
     const userDocRef = doc(db, "employees", currentUser.uid)
 
-    // Fetch employee document
     const userSnapshot = await getDoc(userDocRef)
 
-    // Check if document exists
     if (userSnapshot.exists()) {
       const userData = userSnapshot.data()
 
-      // Log userData to debug
       console.log("Fetched user data:", userData)
 
       if (!userData || !userData.parkOwnerId) {
@@ -267,7 +259,6 @@ export const fetchParkingSlots = async () => {
 
       const parkOwnerId = userData.parkOwnerId
 
-      // If parkOwnerId exists, search for zone data in parkOwner collection
       const parkOwnerDocRef = doc(db, "park_owners", parkOwnerId)
 
       const parkOwnerSnapshot = await getDoc(parkOwnerDocRef)
@@ -275,19 +266,17 @@ export const fetchParkingSlots = async () => {
       if (parkOwnerSnapshot.exists()) {
         const parkOwnerData = parkOwnerSnapshot.data()
 
-        // Log parkOwnerData to debug
         console.log("Fetched park owner data:", parkOwnerData)
 
-        const zoneData = parkOwnerData.zones || {} // Handle potential absence of zoneData
+        const zoneData = parkOwnerData.zones || {} 
 
-        // Function to convert zones data to parkingSlots array
         const convertZonesToParkingSlots = (zones) => {
           const parkingSlots = []
 
           for (const [zone, slots] of Object.entries(zones)) {
             slots.forEach((slot) => {
               parkingSlots.push({
-                zone: zone.replace("Zone ", ""), // Remove "Zone " prefix for numeric zones
+                zone: zone.replace("Zone ", ""), 
                 slot: slot.id,
                 available: slot.available,
               })
@@ -297,17 +286,15 @@ export const fetchParkingSlots = async () => {
           return parkingSlots
         }
 
-        // Convert zoneData to the expected parkingSlots format
         const parkingSlots = convertZonesToParkingSlots(zoneData)
 
-        // Return the flattened parking slots data
         return parkingSlots
       } else {
         console.log("No park owner document found for:", parkOwnerId)
       }
     } else {
       console.log("No user document found for:", currentUser.uid)
-      return null // Or handle differently based on your requirements
+      return null 
     }
   } catch (error) {
     console.error("Error fetching user data:", error.message)
