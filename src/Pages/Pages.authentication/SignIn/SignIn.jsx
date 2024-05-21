@@ -13,48 +13,57 @@ const SignIn = () => {
     handleSubmit,
   } = useForm();
 
-  const onSubmit = async (data) => {
+  const onSubmit = (data) => {
     setLoading(true);
 
-    try {
-      const response = await fetch(
-        "https://parkspottermain.pythonanywhere.com/accounts/user_login/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
+    fetch("https://parkspottermain.pythonanywhere.com/accounts/user_login/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    })
+      .then((res) => {
+        if (res.ok) {
+          console.log(res);
+          return res.json();
+        } else {
+          toast.error(res.statusText);
+          return;
         }
-      );
-
-      const responseData = await response.json();
-      console.log(responseData);
-
-      if (responseData.error) {
-        toast.error("Invalid credentials");
+      })
+      .then((data) => {
+        if (data.role) {
+          localStorage.setItem("role", data.role);
+        }
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user_id", data.user_id);
+        navigate("/dashboard");
+        // console.log(data);
         setLoading(false);
-        throw new Error("Invalid credentials");
-      }
-      if (responseData.is_staff) {
-        localStorage.setItem("is_staff", responseData.is_staff);
-      }
-      localStorage.setItem("token", responseData.token);
-      localStorage.setItem("user_id", responseData.user_id);
-
-      navigate("/dashboard");
-      toast.success("Login successful");
-      setLoading(false);
-    } catch (error) {
-      toast.error("Invalid credentials");
-      setLoading(false);
-    }
+        toast.success("Login successful");
+      })
+      .catch((err) => {
+        toast.error(err.message);
+      });
   };
 
   return (
     <div>
       <Link to={"/"}>
-        <button style={{ margin: "10px", padding: "10px", backgroundColor: "#202123", color: "#ffffff", border: "none", borderRadius: "4px", cursor: "pointer" }}>Home</button>
+        <button
+          style={{
+            margin: "10px",
+            padding: "10px",
+            backgroundColor: "#202123",
+            color: "#ffffff",
+            border: "none",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+        >
+          Home
+        </button>
       </Link>
       <Container>
         <Header>Sign in</Header>
@@ -77,11 +86,7 @@ const SignIn = () => {
           />
           {errors.password && <p role="alert">{errors.password?.message}</p>}
 
-          {loading ? (
-            <Loader />
-          ) : (
-            <input type="submit" value={"Sign In"} />
-          )}
+          {loading ? <Loader /> : <input type="submit" value={"Sign In"} />}
 
           <p>
             Don&apos;t have an account? <Link to={"/signup"}>Sign Up</Link>

@@ -1,4 +1,4 @@
-import  { useState } from "react"
+import { useState } from "react";
 import {
   Button,
   Container,
@@ -10,71 +10,80 @@ import {
   Title,
   TotalAmount,
   WarningMessage,
-} from "./CreateTicket.styled"
+} from "./CreateTicket.styled";
 
 function CreateTicket() {
-  const [carMake, setCarMake] = useState("")
-  const [vehicle, setVehicle] = useState("")
-  const [phone, setPhone] = useState("")
-  const [time_slot, setTime_slot] = useState("")
-  const [totalAmount, setTotalAmount] = useState(0)
-  const parkingNumber = "Zone 1, Parking Lot 7"
-  const [warningMessage, setWarningMessage] = useState("")
+  const [carMake, setCarMake] = useState("");
+  const [vehicle, setVehicle] = useState("");
+  const [phone, setPhone] = useState("");
+  const [time_slot, setTime_slot] = useState("");
+  const [totalAmount, setTotalAmount] = useState(0);
+  const parkingNumber = "Zone 1, Parking Lot 7";
+  const [warningMessage, setWarningMessage] = useState("");
 
   const calculateTotalAmount = (duration) => {
-    let price = 0
+    let price = 0;
     switch (duration) {
       case "1":
-        price = 10
-        break
+        price = 10;
+        break;
       case "2":
-        price = 25
-        break
+        price = 25;
+        break;
       case "3":
-        price = 40
-        break
+        price = 40;
+        break;
       default:
-        price = 0
+        price = 0;
     }
-    setTotalAmount(price)
-  }
+    setTotalAmount(price);
+  };
 
   const generateWarningMessage = () => {
     setWarningMessage(
       `Please be aware that if you exceed your selected parking duration, you will be fined 1 taka per second.`
-    )
-  }
+    );
+  };
 
-  const generateParkingTicket = () => {
+  const generateParkingTicket = async () => {
     const ticket = {
-      // carMake,
-      vehicle,
+      // carMake: 'BMD',
+      // vehicle,
       // phone,
-      time_slot,
+      // time_slot:,
       // totalAmount,
       // parkingNumber
-    }
 
-    fetch("https://parkspottermain.pythonanywhere.com/accounts/bookings/", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+      zone: 1,
+      time_slot: 1,
+      vehicle: {
+        plate_number: "ABC123",
+        mobile_no: "1234567890",
       },
-      body: JSON.stringify(ticket),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Failed to create ticket")
+    };
+
+    try {
+      const response = await fetch(
+        "https://parkspottermain.pythonanywhere.com/accounts/booking/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ticket),
         }
-        return response.json()
-      })
-      .then((data) => {
-        console.log("Ticket created:", data)
-      })
-      .catch((error) => {
-        console.error("Error creating ticket:", error)
-      })
-  }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to create ticket");
+      }
+
+      const data = await response.json();
+      console.log("Ticket created:", data);
+    } catch (error) {
+      console.error("Error creating ticket:", error);
+    }
+  };
 
   return (
     <>
@@ -110,9 +119,9 @@ function CreateTicket() {
           <Select
             value={time_slot}
             onChange={(e) => {
-              setTime_slot(e.target.value)
-              calculateTotalAmount(e.target.value)
-              generateWarningMessage(parseInt(e.target.value))
+              setTime_slot(e.target.value);
+              calculateTotalAmount(e.target.value);
+              generateWarningMessage(parseInt(e.target.value));
             }}
           >
             <option value="">Select Duration</option>
@@ -132,12 +141,9 @@ function CreateTicket() {
         <Button onClick={generateParkingTicket}>Generate Parking Ticket</Button>
       </Container>
     </>
-  )
+  );
 }
 
-export default CreateTicket
-
-
-
+export default CreateTicket;
 
 // original

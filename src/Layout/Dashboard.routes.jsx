@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Outlet } from "react-router-dom"
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import {
   Container,
   Content,
@@ -9,30 +9,58 @@ import {
   MenuIcon,
   MenuItem,
   OutletWrapper,
-} from "./DashBoardRoutes.styles"
+} from "./DashBoardRoutes.styles";
 import {
   DropdownContainer,
   DropdownContent,
   DropdownItem,
   CircularImageContainer,
   Image,
-} from "./DashBoardRoutes.styles"
-import UserProfile from "../Pages/Pages.UserProfile/UserProfile/UserProfile"
+} from "./DashBoardRoutes.styles";
+import UserProfile from "../Pages/Pages.UserProfile/UserProfile/UserProfile";
 
 const Dashboard = () => {
-  const [menuOpen, setMenuOpen] = useState(true)
+  const [menuOpen, setMenuOpen] = useState(true);
 
   const toggleMenu = () => {
-    setMenuOpen(!menuOpen)
-  }
+    setMenuOpen(!menuOpen);
+  };
 
   /* Profile Dropdown start */
-  const [isOpen, setIsOpen] = useState(false)
+  const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen)
-  }
+    setIsOpen(!isOpen);
+  };
   /* Profile Dropdown end */
+
+  const logout = async () => {
+    const token = localStorage.getItem("token"); // Assuming the token is stored in localStorage
+
+    try {
+      const response = await fetch(
+        "https://parkspotter-backened.onrender.com/accounts/logout/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`, // Include the token in the Authorization header
+          },
+          credentials: "include", // Ensure cookies are sent with the request
+        }
+      );
+
+      if (response.ok) {
+        // Clear any stored user information and redirect to the login page
+        localStorage.removeItem("token"); // Remove the token from localStorage
+        window.location.href = "/login"; // Adjust as per your routing
+      } else {
+        console.error("Logout failed:", response);
+      }
+    } catch (error) {
+      console.error("An error occurred during logout:", error);
+    }
+  };
 
   return (
     <Container>
@@ -58,7 +86,7 @@ const Dashboard = () => {
           <DropdownContent isOpen={isOpen}>
             {/* <DropdownItem>Profile</DropdownItem> */}
             <UserProfile />
-            <DropdownItem>Log Out</DropdownItem>
+            <DropdownItem onClick={logout}>Log Out</DropdownItem>
           </DropdownContent>
         </DropdownContainer>
         {/* Profile Dropdown End */}
@@ -82,7 +110,7 @@ const Dashboard = () => {
         </OutletWrapper>
       </Content>
     </Container>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
