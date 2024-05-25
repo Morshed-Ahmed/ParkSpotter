@@ -1,0 +1,17 @@
+const fields = {
+  address: "Bashundhara R/A",
+  amount: 2000,
+  area: "44",
+  capacity: "44",
+  confirm_password: "#Password1",
+  email: "rksadeck@gmail.com",
+  first_name: "MD Jafor",
+  last_name: "Khan",
+  mobile_no: "morshed10",
+  nid_card_no: 12345678901,
+  password: "#Password1",
+  payment_date: "2024-05-11",
+  payment_method: "stripe",
+  slot_size: "44",
+  username: "dddddddddddddd",
+}

@@ -1,86 +1,46 @@
-import { useState } from "react"
-import styled from "styled-components"
-
-const Container = styled.div`
-  background-color: #202123;
-  color: #ffffff;
-  padding: 20px;
-  border-radius: 10px;
-  width: 95%;
-  margin: -10px auto;
-`
-
-const Title = styled.h2`
-  text-align: center;
-  margin-bottom: 20px;
-`
-
-const FormGroup = styled.div`
-  margin-bottom: 20px;
-`
-
-const Label = styled.label`
-  display: block;
-  margin-bottom: 5px;
-`
-
-const Input = styled.input`
-  width: 100%;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  background-color: #333;
-  color: #ffffff;
-`
-
-const Select = styled.select`
-  width: 100%;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  background-color: #333;
-  color: #ffffff;
-`
-
-const Button = styled.button`
-  width: 30%;
-  padding: 12px;
-  border: none;
-  border-radius: 5px;
-  background-color: #4caf50;
-  color: white;
-  font-size: 16px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 20px;
-  &:hover {
-    background-color: #45a049;
-  }
-`
-
-const TotalAmount = styled.div`
-  margin-top: 20px;
-  font-size: 18px;
-`
-
-const StaticParkingNumber = styled.div`
-  margin-top: 20px;
-  font-size: 18px;
-`
-
-const WarningMessage = styled.div`
-  margin-top: 20px;
-  color: #ff0000;
-`
+import React, { useState, useEffect } from "react"
+import {
+  Button,
+  Container,
+  FormGroup,
+  Input,
+  Label,
+  Select,
+  StaticParkingNumber,
+  Title,
+  TotalAmount,
+  WarningMessage,
+} from "./CreateTicket.styled"
+import toast from "react-hot-toast"
 
 function CreateTicket() {
   const [carMake, setCarMake] = useState("")
-  const [carNumber, setCarNumber] = useState("")
+  const [vehicle, setVehicle] = useState("")
   const [phone, setPhone] = useState("")
-  const [parkingDuration, setParkingDuration] = useState("")
+  const [time_slot, setTime_slot] = useState("")
   const [totalAmount, setTotalAmount] = useState(0)
-  const parkingNumber = "Zone 1, Parking Lot 7"
+  const [zones, setZones] = useState([])
+  const [selectedZone, setSelectedZone] = useState("")
   const [warningMessage, setWarningMessage] = useState("")
+
+  useEffect(() => {
+    const fetchZones = async () => {
+      try {
+        const response = await fetch(
+          "https://parkspotter-backened.onrender.com/accounts/zone/"
+        )
+        if (!response.ok) {
+          throw new Error("Failed to fetch zones")
+        }
+        const data = await response.json()
+        setZones(data)
+      } catch (error) {
+        console.error("Error fetching zones:", error)
+      }
+    }
+
+    fetchZones()
+  }, [])
 
   const calculateTotalAmount = (duration) => {
     let price = 0
@@ -106,66 +66,109 @@ function CreateTicket() {
     )
   }
 
-  const generateParkingTicket = () => {
+  const generateParkingTicket = async () => {
+    const selectedZoneData = zones.find((zone) => zone.name === selectedZone)
     const ticket = {
-      carMake,
-      carNumber,
-      phone,
-      parkingDuration,
-      totalAmount,
-      parkingNumber,
+      zone: selectedZoneData ? selectedZoneData.park_owner : null,
+      time_slot: time_slot,
+      vehicle: {
+        plate_number: vehicle,
+        mobile_no: phone,
+      },
     }
-    console.log("Parking ticket generated:", ticket)
+
+    try {
+      const response = await fetch(
+        "https://parkspotter-backened.onrender.com/accounts/bookings/",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ticket),
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error("Failed to create ticket")
+      }
+
+      const data = await response.json()
+      toast.success("Ticket created:", data)
+    } catch (error) {
+      toast.error("Error creating ticket:", error)
+    }
   }
 
   return (
-    <Container>
+    <>
       <Title>Create Ticket</Title>
-      <FormGroup>
-        <Label>Car Make</Label>
-        <Input
-          type="text"
-          value={carMake}
-          onChange={(e) => setCarMake(e.target.value)}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Car Number</Label>
-        <Input
-          type="text"
-          value={carNumber}
-          onChange={(e) => setCarNumber(e.target.value)}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Phone Number</Label>
-        <Input
-          type="text"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-        />
-      </FormGroup>
-      <FormGroup>
-        <Label>Parking Duration</Label>
-        <Select
-          value={parkingDuration}
-          onChange={(e) => {
-            setParkingDuration(e.target.value)
-            calculateTotalAmount(e.target.value)
-            generateWarningMessage(parseInt(e.target.value))
-          }}
-        >
-          <option value="">Select Duration</option>
-          <option value="1">1 hour</option>
-          <option value="2">3 hours</option>
-          <option value="3">6 hours</option>
-        </Select>
-      </FormGroup>
-      <TotalAmount>Total Amount: {totalAmount}</TotalAmount>
-      <StaticParkingNumber>Parking Number: {parkingNumber}</StaticParkingNumber>
-      {warningMessage && <WarningMessage>{warningMessage}</WarningMessage>}
-      <Button onClick={generateParkingTicket}>Generate Parking Ticket</Button>
-    </Container>
+      <Container>
+        <FormGroup>
+          <Label>Car Make</Label>
+          <Input
+            type="text"
+            value={carMake}
+            onChange={(e) => setCarMake(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>Car Number</Label>
+          <Input
+            type="text"
+            value={vehicle}
+            onChange={(e) => setVehicle(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>Phone Number</Label>
+          <Input
+            type="text"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
+        </FormGroup>
+        <FormGroup>
+          <Label>Parking Zone</Label>
+          <Select
+            value={selectedZone}
+            onChange={(e) => setSelectedZone(e.target.value)}
+          >
+            <option value="">Select Zone</option>
+            {zones.map((zone) => (
+              <option key={zone.name} value={zone.name}>
+                {zone.name}
+              </option>
+            ))}
+          </Select>
+        </FormGroup>
+        <FormGroup>
+          <Label>Parking Duration</Label>
+          <Select
+            value={time_slot}
+            onChange={(e) => {
+              setTime_slot(e.target.value)
+              calculateTotalAmount(e.target.value)
+              generateWarningMessage(parseInt(e.target.value))
+            }}
+          >
+            <option value="">Select Duration</option>
+            <option value="1">1 hour</option>
+            <option value="2">3 hours</option>
+            <option value="3">6 hours</option>
+          </Select>
+        </FormGroup>
+        <TotalAmount>
+          Total Amount:{" "}
+          <span style={{ fontWeight: "bold" }}>{totalAmount}tk</span>
+        </TotalAmount>
+        <StaticParkingNumber>
+          Parking Number: Zone 1, Parking Lot 7
+        </StaticParkingNumber>
+        {warningMessage && <WarningMessage>{warningMessage}</WarningMessage>}
+        <Button onClick={generateParkingTicket}>Generate Parking Ticket</Button>
+      </Container>
+    </>
   )
 }
 

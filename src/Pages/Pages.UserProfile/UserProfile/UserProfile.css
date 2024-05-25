@@ -1,33 +1,66 @@
 button {
-    cursor: pointer;
+  cursor: pointer;
 }
 
 p {
-    margin: 0;
+  margin: 0;
 }
 
 p:not(:last-child) {
-    margin-bottom: 1.5em;
+  margin-bottom: 1.5em;
 }
 
 .dialog {
-    /* max-width: 20rem; */
-    width: 80%;
-    padding: 2rem;
-    border: 0;
-    border-radius: 0.5rem;
-    box-shadow: hsl(0 0% 0% / 10%) 0 0 0.5rem 0.25rem;
-    position: relative;
-    margin: 0 auto;
+  /* max-width: 20rem; */
+  width: 80%;
+  padding: 2rem;
+  border: 0;
+  border-radius: 0.5rem;
+  box-shadow: hsl(0 0% 0% / 10%) 0 0 0.5rem 0.25rem;
+  position: relative;
+  margin: 0 auto;
 }
 
 .dialog::backdrop {
-    background: hsl(0 0% 0% / 50%);
+  background: hsl(0 0% 0% / 50%);
 }
 
 .dialog-close-btn {
-    font-size: .75em;
-    position: absolute;
-    top: .25em;
-    right: .25em;
+  font-size: 0.75em;
+  position: absolute;
+  top: 0.25em;
+  right: 0.25em;
+}
+button {
+  cursor: pointer;
+}
+
+p {
+  margin: 0;
+}
+
+p:not(:last-child) {
+  margin-bottom: 1.5em;
+}
+
+.dialog {
+  /* max-width: 20rem; */
+  width: 80%;
+  padding: 2rem;
+  border: 0;
+  border-radius: 0.5rem;
+  box-shadow: hsl(0 0% 0% / 10%) 0 0 0.5rem 0.25rem;
+  position: relative;
+  margin: 0 auto;
+}
+
+.dialog::backdrop {
+  background: hsl(0 0% 0% / 50%);
+}
+
+.dialog-close-btn {
+  font-size: 0.75em;
+  position: absolute;
+  top: 0.25em;
+  right: 0.25em;
 }

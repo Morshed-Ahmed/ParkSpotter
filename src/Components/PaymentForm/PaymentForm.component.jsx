@@ -1,75 +1,67 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js"
-import styled from "styled-components"
 import { useState } from "react"
-
-const StyledPaymentFormContainer = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-`
-
-const StyledPaymentForm = styled.div`
-  background-color: #ffffff;
-  padding: 3rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-`
-
-const StyledHeading = styled.h2`
-  font-size: 1.8rem;
-  font-weight: 600;
-  margin: 0 1rem;
-  color: #202123;
-  text-align: center;
-  margin-bottom: 1.5rem;
-`
-
-const StyledForm = styled.form`
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1.5rem;
-`
-
-const StyledLabel = styled.label`
-  font-size: 1rem;
-  color: #4b5563;
-  margin-bottom: 0.5rem;
-`
-
-const StyledButton = styled.button`
-  width: 100%;
-  padding: 1rem;
-  background-color: #202123;
-  color: #ffffff;
-  font-size: 1rem;
-  font-weight: 600;
-  border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  &:focus {
-    outline: none;
-    box-shadow: 0 0 0 2px rgba(32, 33, 35, 0.2);
-  }
-`
+import { useDispatch, useSelector } from "react-redux"
+import {
+  selectAddress,
+  selectArea,
+  selectCapacity,
+  selectConfirmPassword,
+  selectEmail,
+  selectFirstName,
+  selectLastName,
+  selectMobileNo,
+  selectPassword,
+  selectSlotSize,
+  selectUsername,
+} from "../../store/registration/registration.selector"
+import { selectSubscriptionAmount } from "../../store/payment/payment.selector"
+import { setPaymentType } from "../../store/payment/payment.reducer"
+import toast from "react-hot-toast"
+import { useNavigate } from "react-router-dom"
+import {
+  StyledButton,
+  StyledForm,
+  StyledHeading,
+  StyledLabel,
+  StyledPaymentForm,
+  StyledPaymentFormContainer,
+} from "./PaymentForm.style"
 
 const PaymentForm = () => {
   const stripe = useStripe()
   const elements = useElements()
   const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+  const dispatch = useDispatch()
+  const amount = useSelector(selectSubscriptionAmount)
+  const navigate = useNavigate()
 
-  const amount = 100
   const currentUser = {
-    userName: "rahat test",
+    userName: useSelector(selectUsername),
+    phone: useSelector(selectMobileNo),
+    email: useSelector(selectEmail),
+    address: useSelector(selectAddress),
   }
-  const paymentHandler = async (e) => {
+
+  dispatch(setPaymentType("stripe"))
+
+  const data = {}
+  data.address = useSelector(selectAddress)
+  data.amount = useSelector(selectSubscriptionAmount)
+  data.area = useSelector(selectArea)
+  data.capacity = useSelector(selectCapacity)
+  data.confirm_password = useSelector(selectConfirmPassword)
+  data.email = useSelector(selectEmail)
+  data.first_name = useSelector(selectFirstName)
+  data.last_name = useSelector(selectLastName)
+  data.mobile_no = useSelector(selectMobileNo)
+  data.nid_card_no = 12345678901
+  data.password = useSelector(selectPassword)
+  data.payment_date = "2024-05-11"
+  data.payment_method = "stripe"
+  data.slot_size = useSelector(selectSlotSize)
+  data.username = useSelector(selectUsername)
+
+  const paymentHandler = async (e, data) => {
     e.preventDefault()
 
     if (!stripe || !elements) {
@@ -89,12 +81,16 @@ const PaymentForm = () => {
       paymentIntent: { client_secret },
     } = response
 
-    console.log(client_secret)
     const paymentResult = await stripe.confirmCardPayment(client_secret, {
       payment_method: {
         card: elements.getElement(CardElement),
         billing_details: {
           name: currentUser ? currentUser.userName : "Guest",
+          address: {
+            line1: currentUser ? currentUser.address : "N/A",
+          },
+          phone: currentUser ? currentUser.phone : "N/A",
+          email: currentUser ? currentUser.email : "N/A",
         },
       },
     })
@@ -105,6 +101,30 @@ const PaymentForm = () => {
       alert(`Error: ${paymentResult.error.message}`)
     } else {
       if (paymentResult.paymentIntent.status === "succeeded") {
+        const response = await fetch(
+          "https://parkspotter-backened.onrender.com/accounts/register/",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          }
+        )
+          .then((response) => {
+            if (!response.ok) {
+              console.error("Error:")
+            }
+            return response.json()
+          })
+          .then((data) => {
+            toast.success(data)
+            navigate("/login")
+          })
+          .catch((error) => {
+            console.error("Error:", error)
+          })
+        console.log(response)
         alert("Payment Success")
       }
     }
@@ -114,7 +134,7 @@ const PaymentForm = () => {
     <StyledPaymentFormContainer>
       <StyledPaymentForm>
         <StyledHeading>Secure Payment</StyledHeading>
-        <StyledForm onSubmit={paymentHandler}>
+        <StyledForm onSubmit={(e) => paymentHandler(e, data)}>
           <div>
             <StyledLabel htmlFor="card-element">
               Credit Card Information
@@ -156,3 +176,5 @@ const PaymentForm = () => {
 }
 
 export default PaymentForm
+
+// comment

@@ -1,29 +1,42 @@
 import { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { FiAlignJustify } from "react-icons/fi";
 import { parkSpotterLogo } from "../../../assets/Logo/Logo";
+import { IoIosCloseCircleOutline } from "react-icons/io";
+import { useDispatch } from "react-redux";
+import { setSubscriptionAmount } from "../../../store/payment/payment.reducer";
+import { MdDashboard } from "react-icons/md";
+
+const PrimaryColor = "#202123";
+const SecondaryColor = "#ffffff";
+const ComplementaryColor = "coral";
 
 const NavbarContainer = styled.nav`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 91%;
-  margin: auto;
-  height: 80px;
+  width: 100%;
+  padding: 20px 5%;
+  background-color: ${SecondaryColor};
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 0;
+  z-index: 999;
 `;
 
 const Logo = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
-  h1 {
-    font-weight: bold;
-    font-size: 1.94rem;
+  color: ${PrimaryColor};
+  font-family: "Poppins", sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  text-transform: uppercase;
 
-    @media (max-width: 768px) {
-      font-size: 1.4rem;
-    }
+  img {
+    width: 40px;
+    margin-right: 10px;
   }
 `;
 
@@ -31,27 +44,31 @@ const Menu = styled.ul`
   list-style: none;
   display: flex;
   align-items: center;
-  gap: 45px;
+  gap: 30px;
 
   @media (max-width: 768px) {
     display: ${({ isopen }) => (isopen === "true" ? "flex" : "none")};
     flex-direction: column;
     position: absolute;
-    top: 12%;
+    top: 100%;
     left: 0;
     width: 100%;
-    background-color: #fff;
-    padding: 20px;
-    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    background-color: ${SecondaryColor};
+    padding: 20px 0;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
   }
 `;
 
 const MenuItem = styled(NavLink)`
   text-decoration: none;
-  font-size: 20px;
+  font-size: 1rem;
   font-weight: 600;
-  line-height: 14px;
-  color: black;
+  color: ${PrimaryColor};
+  transition: color 0.3s ease;
+
+  &:hover {
+    color: ${ComplementaryColor};
+  }
 `;
 
 const ToggleButton = styled.div`
@@ -59,12 +76,10 @@ const ToggleButton = styled.div`
 
   @media (max-width: 768px) {
     display: block;
+    color: ${PrimaryColor};
+    cursor: pointer;
   }
 `;
-
-// Subscription Modal style start
-import { IoIosCloseCircleOutline } from "react-icons/io";
-import UserProfile from "../../Pages.UserProfile/UserProfile/UserProfile";
 
 const ModalBackground = styled.div`
   position: fixed;
@@ -82,14 +97,12 @@ const ModalBackground = styled.div`
 `;
 
 const ModalContent = styled.div`
-  background-color: white;
+  background-color: ${SecondaryColor};
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   width: 80%;
-  ${"" /* height: 80%; */}
   max-width: 800px;
-  ${"" /* max-height: 600px; */}
   position: relative;
   transition: transform 0.3s ease, opacity 0.3s ease;
   transform: translateY(${(props) => (props.isModalOpen ? "0" : "-50px")});
@@ -103,7 +116,9 @@ const CloseButton = styled.button`
   background: none;
   border: none;
   cursor: pointer;
+  color: ${PrimaryColor};
 `;
+
 const SubscriptionCardsContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -116,7 +131,7 @@ const SubscriptionCard = styled.div`
   width: 300px;
   padding: 20px;
   border-radius: 8px;
-  background-color: white;
+  background-color: ${SecondaryColor};
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition: box-shadow 0.3s ease;
 
@@ -134,22 +149,34 @@ const SubscriptionCard = styled.div`
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
+  font-size: 1.2rem;
   margin-bottom: 10px;
+  color: ${PrimaryColor};
 `;
 
 const Description = styled.p`
-  font-size: 16px;
+  font-size: 1rem;
   color: #666;
 `;
 
 const Price = styled.div`
-  font-size: 24px;
+  font-size: 1.2rem;
   font-weight: bold;
   margin-top: 20px;
+  color: ${ComplementaryColor};
 `;
-// Subscription Modal style end
-// Subscription Modal start
+
+const SignInLinkContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-direction: row;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+`;
+
 const CustomModal = ({ isOpen, onClose, children }) => {
   return (
     <ModalBackground isModalOpen={isOpen} onClick={onClose}>
@@ -162,10 +189,11 @@ const CustomModal = ({ isOpen, onClose, children }) => {
     </ModalBackground>
   );
 };
-// Subscription Modal end
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
@@ -173,7 +201,6 @@ const Navbar = () => {
 
   const user_id = localStorage.getItem("user_id");
 
-  // Subscription Modal start
   const [modalOpen, setModalOpen] = useState(false);
   const openModal = () => {
     setModalOpen(true);
@@ -181,101 +208,98 @@ const Navbar = () => {
   const closeModal = () => {
     setModalOpen(false);
   };
-  const handlePrice = (price) => {
-    console.log(`Price clicked: ${price}`);
+
+  const handlePrice = (priceString) => {
+    const priceNumeric = parseFloat(priceString.replace("$", ""));
+    dispatch(setSubscriptionAmount(priceNumeric));
+    const is_staff = localStorage.getItem("is_staff");
+    if (!is_staff) {
+      navigate("/signup");
+    } else {
+      setModalOpen(false);
+      navigate("/payment");
+    }
   };
-  // Subscription Modal end
+
   return (
     <NavbarContainer>
-      <Logo>
-        <img style={{ width: "50px" }} src={parkSpotterLogo} alt="" />
-        <h1>ParkSpotter</h1>
-      </Logo>
+      <NavLink to={"/"}>
+        <Logo>
+          <img src={parkSpotterLogo} alt="ParkSpotter Logo" />
+          ParkSpotter
+        </Logo>
+      </NavLink>
       <ToggleButton onClick={toggleMenu}>
-        <FiAlignJustify size={"25px"} cursor={"pointer"} />
+        <FiAlignJustify size={"25px"} />
       </ToggleButton>
       <Menu isopen={isOpen.toString()}>
-        {/* Subscription Modal Content start */}
         <div>
-          <button onClick={openModal}>Subscription</button>
+          {/* <button
+            style={{
+              fontWeight: "600",
+              backgroundColor: `${PrimaryColor}`,
+              padding: "8px 15px",
+              color: "white",
+              borderRadius: "29px",
+            }}
+            onClick={openModal}
+          >
+            Subscribe
+          </button> */}
           <CustomModal isOpen={modalOpen} onClose={closeModal}>
-            <div>
-              <SubscriptionCardsContainer>
-                <SubscriptionCard onClick={() => handlePrice("$9.99")}>
-                  <Title>1 Month Plan</Title>
-                  <Description>
-                    Access to basic features for 1 month
-                  </Description>
-                  <Price>$9.99</Price>
-                </SubscriptionCard>
-                <SubscriptionCard onClick={() => handlePrice("$49.99")}>
-                  <Title>6 Month Plan</Title>
-                  <Description>
-                    Access to basic features for 6 months
-                  </Description>
-                  <Price>$49.99</Price>
-                </SubscriptionCard>
-                <SubscriptionCard onClick={() => handlePrice("$89.99")}>
-                  <Title>1 Year Plan</Title>
-                  <Description>Access to basic features for 1 year</Description>
-                  <Price>$89.99</Price>
-                </SubscriptionCard>
-              </SubscriptionCardsContainer>
-            </div>
+            <SubscriptionCardsContainer>
+              <SubscriptionCard onClick={() => handlePrice("$9.99")}>
+                <Title>1 Month Plan</Title>
+                <Description>Access to basic features for 1 month</Description>
+                <Price>$9.99</Price>
+              </SubscriptionCard>
+              <SubscriptionCard onClick={() => handlePrice("$49.99")}>
+                <Title>6 Month Plan</Title>
+                <Description>Access to basic features for 6 months</Description>
+                <Price>$49.99</Price>
+              </SubscriptionCard>
+              <SubscriptionCard onClick={() => handlePrice("$89.99")}>
+                <Title>1 Year Plan</Title>
+                <Description>Access to basic features for 1 year</Description>
+                <Price>$89.99</Price>
+              </SubscriptionCard>
+            </SubscriptionCardsContainer>
           </CustomModal>
         </div>
-        {/* Subscription Modal Content start */}
-        <MenuItem to={"/login"}>LogIn</MenuItem>
+
         <div>
           {user_id ? (
-            <>
-              <NavLink to={"/dashboard"}>
-                <button
-                  style={{
-                    padding: "15px 30px ",
-                    fontSize: "18px",
-                    borderRadius: "18px",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  Dashboard
-                </button>
-              </NavLink>
-
-
-
-            </>
+            <NavLink
+              style={{ display: "flex", alignItems: "center", gap: "5px" }}
+              to={"/dashboard"}
+            >
+              <MdDashboard />
+              <button style={{ fontWeight: "600" }}> Dashboard</button>
+            </NavLink>
           ) : (
-            <>
+            <SignInLinkContainer>
+              <MenuItem to={"/login"}>LogIn</MenuItem>
               <NavLink to={"/signup"}>
                 <button
                   style={{
-                    padding: "15px 30px ",
-                    fontSize: "18px",
-                    borderRadius: "18px",
-                    border: "none",
-                    cursor: "pointer",
+                    fontWeight: "600",
+                    backgroundColor: `${PrimaryColor}`,
+                    padding: "8px 15px",
+                    color: "white",
+                    borderRadius: "29px",
                   }}
                 >
                   Signup 👋
                 </button>
               </NavLink>
-
-              <NavLink to={""}>
-                <button
-                  style={{
-                    padding: "15px 30px ",
-                    fontSize: "18px",
-                    borderRadius: "18px",
-                    border: "none",
-                    cursor: "pointer",
-                  }}
-                >
-                  <UserProfile />
-                </button>
+              <NavLink
+                style={{ display: "flex", alignItems: "center", gap: "5px" }}
+                to={"/demoDashboard"}
+              >
+                <MdDashboard />
+                <button style={{ fontWeight: "600" }}>Demo dashboard</button>
               </NavLink>
-            </>
+            </SignInLinkContainer>
           )}
         </div>
       </Menu>
@@ -284,3 +308,5 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
+// export default Navbar;

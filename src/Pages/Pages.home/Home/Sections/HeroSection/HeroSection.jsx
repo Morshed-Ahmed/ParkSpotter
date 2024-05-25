@@ -1,7 +1,7 @@
 
 const HeroSection = () => {
   return (
-    <div className="mt-20 mb-10 flex flex-col md:flex-row w-full md:w-10/12 mx-auto">
+    <div className="mt-36 mb-10 flex flex-col md:flex-row w-full md:w-10/12 mx-auto">
       <div className="w-full md:w-3/6 flex flex-col justify-center items-center md:items-start">
         <h1 className="mb-10 text-3xl md:text-4xl font-bold text-center md:text-left md:mb-4 ">
           Everything for your car

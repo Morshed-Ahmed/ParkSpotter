@@ -1,6 +1,6 @@
-import styled from "styled-components"
-import { NavLink } from "react-router-dom"
-import * as css from "../Utils/Styles/styles"
+import styled from "styled-components";
+import { NavLink } from "react-router-dom";
+import * as css from "../../Utils/Styles/styles";
 
 // Dashboard starts
 
@@ -10,7 +10,7 @@ export const Container = styled.div`
   height: 100vh;
   background-color: ${css.secondaryColor};
   color: ${css.primaryColor};
-`
+`;
 
 export const Header = styled.div`
   display: flex;
@@ -20,11 +20,11 @@ export const Header = styled.div`
   color: #fff;
   background-color: #202123;
   // border-bottom: 4px solid #fff;
-`
+`;
 
 export const MenuButton = styled.div`
   cursor: pointer;
-`
+`;
 
 export const MenuIcon = styled.svg`
   width: 30px;
@@ -35,7 +35,7 @@ export const MenuIcon = styled.svg`
   &:hover {
     fill: ${css.complimentaryColor};
   }
-`
+`;
 
 export const MenuContainer = styled.div`
   width: ${(props) => (props.open ? "240px" : "0px")};
@@ -49,7 +49,7 @@ export const MenuContainer = styled.div`
   @media (max-width: 768px) {
     width: ${(props) => (props.open ? "200px" : "0px")};
   }
-`
+`;
 
 export const MenuItem = styled(NavLink)`
   display: block;
@@ -71,7 +71,7 @@ export const MenuItem = styled(NavLink)`
     font-size: 0.9rem;
     font-size: 0.9rem;
   }
-`
+`;
 
 export const Content = styled.div`
   display: flex;
@@ -86,7 +86,7 @@ export const Content = styled.div`
 
   -ms-overflow-style: none;
   scrollbar-width: none;
-`
+`;
 export const OutletWrapper = styled.div`
   flex: 1;
   background-color: ${css.secondaryColor};
@@ -94,7 +94,7 @@ export const OutletWrapper = styled.div`
   box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.1);
   overflow-y: auto;
   min-height: calc(100vh - 64px);
-`
+`;
 
 // Dashboard ends
 
@@ -102,7 +102,7 @@ export const OutletWrapper = styled.div`
 export const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
-`
+`;
 
 export const CircularImageContainer = styled.div`
   width: 40px;
@@ -110,13 +110,13 @@ export const CircularImageContainer = styled.div`
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
-`
+`;
 
 export const Image = styled.img`
   width: 100%;
   height: 100%;
   object-fit: cover;
-`
+`;
 
 export const DropdownContent = styled.div`
   display: ${(props) => (props.isOpen ? "block" : "none")};
@@ -130,7 +130,7 @@ export const DropdownContent = styled.div`
   @media (max-width: 768px) {
     min-width: 120px;
   }
-`
+`;
 
 export const DropdownItem = styled.button`
   color: black;
@@ -145,5 +145,12 @@ export const DropdownItem = styled.button`
     background-color: #ddd;
     border-radius: 10px;
   }
-`
+`;
 // Profile Dropdown style End
+
+export const SubscribeButton = styled(NavLink)`
+  background-color: white;
+  color: black;
+  padding: 8px;
+  border-radius: 15px;
+`;

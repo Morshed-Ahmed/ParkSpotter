@@ -1,41 +1,130 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
-export const Container = styled.div`
-  width: 50%;
-  margin: auto;
-  border: 1px solid black;
-  border-radius: 10px;
-  padding: 20px;
-`
+export const DropdownItem = styled.button`
+  color: black;
+  padding: 10px 20px;
+  border: none;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  background-color: transparent;
 
-export const Header = styled.h1`
+  &:hover {
+    background-color: #ddd;
+    border-radius: 10px;
+  }
+`;
+
+export const ProfileTitle = styled.h1`
+  font-size: 20px;
+  font-weight: 600;
   text-align: center;
-  margin-bottom: 10px;
-`
+  margin: 12px;
 
-export const Form = styled.form`
+  @media (max-width: 768px) {
+    font-size: 15px;
+  }
+`;
+
+export const CircularImageContainer = styled.div`
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  overflow: hidden;
+  cursor: pointer;
+  margin: auto;
+  @media (max-width: 768px) {
+    width: 100px;
+    height: 100px;
+  }
+`;
+
+export const Image = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+export const ProfileField = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  width: 400px;
+  margin: auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+`;
+
+export const Label = styled.label`
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 5px;
+`;
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f5f5f5;
+  &:disabled {
+    background-color: #e9ecef;
+  }
+`;
+
+export const ButtonContainer = styled.div`
+  display: flex;
   gap: 10px;
+  margin-top: 20px;
+`;
 
-  input {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #cccccc;
+export const EditButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #007bff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #0056b3;
   }
+`;
 
-  input[type="submit"] {
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #cccccc;
-    cursor: pointer;
+export const CancelButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #007bff;
+  background-color: #fff;
+  border: 1px solid #007bff;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #e9ecef;
   }
+`;
 
-  p[role="alert"] {
-    color: red;
-    border: 1px solid red;
-    padding: 10px;
-    background: #fdede8;
-    border-radius: 5px;
+export const SaveButton = styled.button`
+  padding: 10px 20px;
+  font-size: 16px;
+  color: #fff;
+  background-color: #28a745;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  &:hover {
+    background-color: #218838;
   }
-`
+  &:disabled {
+    background-color: #c3e6cb;
+    cursor: not-allowed;
+  }
+`;
+
+export const ProfileFieldContainer = styled.div`
+  margin-top: 12px;
+`;

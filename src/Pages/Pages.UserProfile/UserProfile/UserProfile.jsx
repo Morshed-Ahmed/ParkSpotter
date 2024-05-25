@@ -1,128 +1,240 @@
-import React from "react";
+import { useEffect, useState } from "react";
 import Modal from "./Modal/Modal";
+import {
+  ButtonContainer,
+  CancelButton,
+  CircularImageContainer,
+  DropdownItem,
+  EditButton,
+  Image,
+  Label,
+  ProfileField,
+  ProfileFieldContainer,
+  ProfileTitle,
+  SaveButton,
+  Input,
+} from "./UserProfile.styles";
 
-import { useForm } from "react-hook-form"
-import { Link } from "react-router-dom"
-import { Container, Header, Form } from "./UserProfile.styles"
 const UserProfile = () => {
-    const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [formValues, setFormValues] = useState({
+    fullName: "",
+    email: "",
+    mobile_no: "",
+    address: "",
+    area: "",
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
 
-    const handleClose = () => {
-        setOpen(false);
-    };
+  const user_id = localStorage.getItem("user_id");
 
-    const handleOpen = () => {
-        setOpen(true);
-    };
+  useEffect(() => {
+    fetch(
+      `https://parkspotter-backened.onrender.com/accounts/profile/${user_id}`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log(data);
 
+        setFormValues({
+          username: data.park_owner_id.username || "",
+          email: data.park_owner_id.email || "",
+          mobile_no: data.mobile_no || "",
+          address: data.address || "",
+          area: data.area || "",
+          nid_card_no: data.nid_card_no || "",
+          currentPassword: "",
+          newPassword: "",
+          confirmPassword: "",
+        });
+      });
+  }, [user_id]);
 
-    const {
-        register,
-        formState: { errors },
-        handleSubmit,
-    } = useForm()
+  const handleOpen = () => {
+    setOpen(true);
+  };
 
-    const onSubmit = (data) => {
-        console.log(data)
-    }
-    return (
-        <div
-            style={{
-                textAlign: "center",
-                display: "block",
-                padding: 30,
-                margin: "auto",
-            }}
-        >
-            <button type="button" onClick={handleOpen}>
-                Profile
-            </button>
-            <Modal isOpen={open} onClose={handleClose}>
+  const handleClose = () => {
+    setOpen(false);
+    setIsEditing(false);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
+  const handleEditClick = () => {
+    setIsEditing(true);
+  };
+
+  const handleCancelClick = () => {
+    setIsEditing(false);
+  };
+
+  const handleSaveClick = () => {
+    fetch(
+      `https://parkspotter-backened.onrender.com/accounts/profile/${user_id}`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify({
+          username: formValues.username,
+          email: formValues.email,
+          mobile_no: formValues.mobile_no,
+          address: formValues.address,
+          area: formValues.area,
+          nid_card_no: formValues.nid_card_no,
+          password: formValues.newPassword,
+        }),
+      }
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        console.log("Profile updated:", data);
+        setIsEditing(false);
+      })
+      .catch((error) => {
+        console.error("Error updating profile:", error);
+      });
+  };
+
+  return (
+    <div>
+      <DropdownItem type="button" onClick={handleOpen}>
+        Profile
+      </DropdownItem>
+      <Modal isOpen={open} onClose={handleClose}>
+        <div>
+          <ProfileTitle>Personal Information</ProfileTitle>
+
+          <CircularImageContainer>
+            <Image
+              src={
+                "https://img.freepik.com/free-photo/handsome-bearded-guy-posing-against-white-wall_273609-20597.jpg?size=626&ext=jpg&ga=GA1.1.2082370165.1715644800&semt=sph"
+              }
+              alt={"Profile image"}
+            />
+          </CircularImageContainer>
+          <ProfileFieldContainer>
+            <ProfileField>
+              <Label>Username</Label>
+              <Input
+                type="text"
+                name="username"
+                value={formValues.username}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+              />
+            </ProfileField>
+            <ProfileField>
+              <Label>Email Address</Label>
+              <Input
+                type="email"
+                name="email"
+                value={formValues.email}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+              />
+            </ProfileField>
+            <ProfileField>
+              <Label>Phone</Label>
+              <Input
+                type="tel"
+                name="mobile_no"
+                value={formValues.mobile_no}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+              />
+            </ProfileField>
+            <ProfileField>
+              <Label>Address</Label>
+              <Input
+                type="tel"
+                name="address"
+                value={formValues.address}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+              />
+            </ProfileField>
+            <ProfileField>
+              <Label>Area</Label>
+              <Input
+                type="tel"
+                name="area"
+                value={formValues.area}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+              />
+            </ProfileField>
+            <ProfileField>
+              <Label>Nid No</Label>
+              <Input
+                type="tel"
+                name="nid_card_no"
+                value={formValues.nid_card_no}
+                onChange={handleInputChange}
+                disabled={!isEditing}
+              />
+            </ProfileField>
+
+            {/* {isEditing && (
+              <>
+                <ProfileField>
+                  <Label>Password</Label>
+                  <Input
+                    type="password"
+                    name="currentPassword"
+                    placeholder="Current Password"
+                    value={formValues.currentPassword}
+                    onChange={handleInputChange}
+                  />
+                </ProfileField>
+                <ProfileField>
+                  <Input
+                    type="password"
+                    name="newPassword"
+                    placeholder="New Password"
+                    value={formValues.newPassword}
+                    onChange={handleInputChange}
+                  />
+                </ProfileField>
+                <ProfileField>
+                  <Input
+                    type="password"
+                    name="confirmPassword"
+                    placeholder="Retype Password"
+                    value={formValues.confirmPassword}
+                    onChange={handleInputChange}
+                  />
+                </ProfileField>
+              </>
+            )}
+            <ButtonContainer>
+              {isEditing ? (
                 <>
-                    <Container>
-                        <Header>Profile Update</Header>
-                        <Form onSubmit={handleSubmit(onSubmit)}>
-                            <input
-                                placeholder="Username"
-                                type="text"
-                                {...register("userName", { required: true })}
-                                aria-invalid={errors.userName ? "true" : "false"}
-                                disabled
-                            />
-                            {errors.userName?.type === "required" && (
-                                <p role="alert">Username is required</p>
-                            )}
-
-                            <input
-                                placeholder="First name"
-                                type="text"
-                                {...register("firstName", { required: true })}
-                                aria-invalid={errors.firstName ? "true" : "false"}
-                            />
-                            {errors.firstName?.type === "required" && (
-                                <p role="alert">First name is required</p>
-                            )}
-
-                            <input
-                                placeholder="Last name"
-                                type="text"
-                                {...register("lastName", { required: true })}
-                                aria-invalid={errors.lastName ? "true" : "false"}
-                            />
-                            {errors.lastName?.type === "required" && (
-                                <p role="alert">Last name is required</p>
-                            )}
-
-                            <input
-                                placeholder="Email"
-                                type="email"
-                                {...register("email", { required: true })}
-                                aria-invalid={errors.email ? "true" : "false"}
-                                disabled
-                            />
-                            {errors.email?.type === "required" && (
-                                <p role="alert">Email name is required</p>
-                            )}
-
-                            <input
-                                placeholder="Phone Number"
-                                type="number"
-                                {...register("phone", { required: true })}
-                                aria-invalid={errors.phone ? "true" : "false"}
-                            />
-                            {errors.phone?.type === "required" && (
-                                <p role="alert">Phone Number name is required</p>
-                            )}
-
-                            <input
-                                placeholder="Address"
-                                type="text"
-                                {...register("address", { required: true })}
-                                aria-invalid={errors.address ? "true" : "false"}
-                            />
-                            {errors.address?.type === "required" && (
-                                <p role="alert">Address name is required</p>
-                            )}
-
-                            <input
-                                placeholder="Password"
-                                type="password"
-                                {...register("password", { required: "Password is required" })}
-                                aria-invalid={errors.password ? "true" : "false"}
-                            />
-                            {errors.password && <p role="alert">{errors.password?.message}</p>}
-
-                            <input type="submit" value={"Update"} />
-
-                            <p>
-                                Go to Dashboard? <Link to={"/dashboard"}>Dashboard</Link>
-                            </p>
-                        </Form>
-                    </Container>
+                  <CancelButton onClick={handleCancelClick}>
+                    Cancel
+                  </CancelButton>
+                  <SaveButton onClick={handleSaveClick}>
+                    Save Changes
+                  </SaveButton>
                 </>
-            </Modal>
+              ) : (
+                <EditButton onClick={handleEditClick}>Edit Profile</EditButton>
+              )}
+            </ButtonContainer> */}
+          </ProfileFieldContainer>
         </div>
-    );
+      </Modal>
+    </div>
+  );
 };
 
 export default UserProfile;
