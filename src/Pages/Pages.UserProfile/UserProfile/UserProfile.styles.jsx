@@ -104,7 +104,7 @@ export const CancelButton = styled.button`
   border-radius: 5px;
   cursor: pointer;
   &:hover {
-    background-color: #e9ecef;
+    background-color: #f8f9fa;
   }
 `;
 
@@ -119,12 +119,11 @@ export const SaveButton = styled.button`
   &:hover {
     background-color: #218838;
   }
-  &:disabled {
-    background-color: #c3e6cb;
-    cursor: not-allowed;
-  }
 `;
 
 export const ProfileFieldContainer = styled.div`
-  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
 `;

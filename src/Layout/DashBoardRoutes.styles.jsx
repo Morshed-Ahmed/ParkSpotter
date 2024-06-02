@@ -4,6 +4,7 @@ import * as css from "../Utils/Styles/styles"
 
 // Dashboard starts
 
+
 export const Container = styled.div`
   display: flex;
   flex-direction: column;
@@ -18,12 +19,13 @@ export const Header = styled.div`
   align-items: center;
   padding: 1rem;
   color: #fff;
-  background-color: #202123;
+  background-color: #405189;
   // border-bottom: 4px solid #fff;
 `
 
 export const MenuButton = styled.div`
   cursor: pointer;
+  
 `
 
 export const MenuIcon = styled.svg`
@@ -41,37 +43,105 @@ export const MenuContainer = styled.div`
   width: ${(props) => (props.open ? "240px" : "0px")};
   transition: width 0.3s ease;
   border-right: 1px solid #202123;
-  overflow: hidden;
-  background-color: #202123;
+  ${"" /* overflow: hidden; */}
+  background-color: #405189;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
   border-top: 4px solid #fff;
+  ${"" /* height: 89vh;
+  overflow: scroll;
+  overflow-x: hidden;
+  scrollbar-color: #ddd transparent;
+  scrollbar-width: thin;
+  scrollbar-border: 1px solid red; */
+  }
+
+  ${"" /* width: 100%; */}
+  height: 100%;
+  overflow: auto;
+
+  /* Scrollbar styles */
+  ::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 50px; /* Rounded corners for the track */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 50px; /* Rounded corners for the thumb */
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+
+  /* Firefox scrollbar styles */
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+
+  /* Apply rounded corners in Firefox */
+  & {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+  }
+
+  &::-webkit-scrollbar {
+    width: 12px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+    border: 3px solid #f1f1f1;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: #555;
+  }
 
   @media (max-width: 768px) {
-    width: ${(props) => (props.open ? "200px" : "0px")};
+    position: fixed;
+    top: 15;
+    left: 0;
+    z-index: 999;
   }
 `
 
 export const MenuItem = styled(NavLink)`
   display: block;
   text-decoration: none;
-  padding: 1rem;
+  padding: 12px;
   color: ${css.secondaryColor};
   font-size: 1rem;
   transition: background-color 0.3s ease;
-  margin: 20px 5px;
-  border-radius: 25px;
+  margin: 10px 15px 10px 0;
+  border-top-right-radius: 99px;
+  border-bottom-right-radius: 99px;
 
   &:hover {
-    background-color: ${css.complimentaryColor};
+    background-color: #fff;
+    color: #202123;
     font-weight: bold;
+  }
+
+  &.active {
+    background-color: #fff; 
+    color: #202123; 
     font-weight: bold;
   }
 
   @media (max-width: 768px) {
     font-size: 0.9rem;
-    font-size: 0.9rem;
   }
-`
+`;
 
 export const Content = styled.div`
   display: flex;

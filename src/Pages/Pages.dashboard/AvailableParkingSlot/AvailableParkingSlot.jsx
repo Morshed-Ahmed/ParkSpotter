@@ -11,7 +11,6 @@ import {
   Select,
   Slot,
   theme,
-  Title,
   ZoneContainer,
   ZoneTitle,
 } from "./AvailableParkingSlots.styled"
@@ -21,134 +20,149 @@ const AvailableParkingSlotTest = () => {
   const [availableParkingSlots, setAvailableParkingSlots] = useState([])
   const [zones, setZones] = useState([])
   const [selectedZoneName, setSelectedZoneName] = useState("")
-  const [selectedAvailability, setSelectedAvailability] = useState(null)
+  const [selectedAvailability, setSelectedAvailability] = useState("")
   const [selectedSlot, setSelectedSlot] = useState("")
+  const userRole = localStorage.getItem("role")
+  const userId = localStorage.getItem("user_id")
 
   useEffect(() => {
-    const fetchParkingSlots = async () => {
+    const fetchZonesAndSlots = async () => {
       try {
-        const response = await fetch(
+        let parkOwnerZones = []
+
+        if (userRole === "park_owner") {
+          // Fetch all zones
+          const token = localStorage.getItem("token")
+
+          const zonesResponse = await fetch(
+            "https://parkspotter-backened.onrender.com/accounts/zone/",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${token}`,
+              },
+            }
+          )
+          if (!zonesResponse.ok) {
+            throw new Error("Failed to fetch zones")
+          }
+          const zonesData = await zonesResponse.json()
+          // Filter zones by park owner
+          parkOwnerZones = zonesData.filter(
+            (zone) => zone.park_owner.toString() === userId
+          )
+          setZones(parkOwnerZones)
+        } else if (userRole === "employee") {
+          // Fetch employee details
+          const employeeResponse = await fetch(
+            "https://parkspotter-backened.onrender.com/accounts/employee-list/"
+          )
+          if (!employeeResponse.ok) {
+            throw new Error("Failed to fetch employees")
+          }
+          const employeesData = await employeeResponse.json()
+          const employeeData = employeesData.find(
+            (employee) => employee.employee.id.toString() === userId
+          )
+          console.log({ employeesData })
+          console.log({ employeeData })
+          if (!employeeData) {
+            throw new Error("Employee not found")
+          }
+          const parkOwnerId = employeeData.park_owner_id
+          // Fetch all zones
+          const token = localStorage.getItem("token")
+          if (!token) {
+            console.error("Token not found in local storage")
+            return
+          }
+          const zonesResponse = await fetch(
+            "https://parkspotter-backened.onrender.com/accounts/zone/",
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Token ${token}`,
+              },
+            }
+          )
+
+          console.log({ zonesResponse })
+          if (!zonesResponse.ok) {
+            throw new Error("Failed to fetch zones")
+          }
+          const zonesData = await zonesResponse.json()
+          // Filter zones by park owner id
+          parkOwnerZones = zonesData.filter(
+            (zone) => zone.park_owner === parkOwnerId
+          )
+          console.log({ parkOwnerZones })
+          setZones(parkOwnerZones)
+        }
+
+        // Fetch all slots
+        const slotsResponse = await fetch(
           "https://parkspotter-backened.onrender.com/accounts/slot/"
         )
-        if (!response.ok) {
-          throw new Error("Failed to fetch parking slots")
+        if (!slotsResponse.ok) {
+          throw new Error("Failed to fetch slots")
         }
-        const data = await response.json()
-        const correctedData = data.map((slot) => ({
-          ...slot,
-          available: !slot.available,
-        }))
-        setAvailableParkingSlots(correctedData)
-      } catch (error) {
-        console.error("Error fetching parking slots:", error)
-      }
-    }
-
-    fetchParkingSlots()
-  }, [])
-
-  useEffect(() => {
-    const fetchZones = async () => {
-      try {
-        const response = await fetch(
-          "https://parkspotter-backened.onrender.com/accounts/zone/"
+        const slotsData = await slotsResponse.json()
+        // Filter slots by park owner zones
+        const parkOwnerZoneIds = parkOwnerZones.map((zone) => zone.id)
+        const filteredSlots = slotsData.filter((slot) =>
+          parkOwnerZoneIds.includes(slot.zone)
         )
-        if (!response.ok) {
-          throw new Error("Failed to fetch zones")
-        }
-        const data = await response.json()
-        setZones(data)
+        console.log({ filteredSlots })
+        setAvailableParkingSlots(filteredSlots)
       } catch (error) {
-        console.error("Error fetching zones:", error)
+        console.error("Error fetching data:", error)
+        toast.error("Failed to load data. Please try again.")
       }
     }
 
-    fetchZones()
-  }, [])
-
-  const groupByZone = (parkingSlots) => {
-    const grouped = {}
-    parkingSlots.forEach((slot) => {
-      if (!grouped[slot.zone]) {
-        grouped[slot.zone] = []
-      }
-      grouped[slot.zone].push(slot)
-    })
-    return grouped
-  }
-
-  const groupedParkingSlots = groupByZone(availableParkingSlots)
+    fetchZonesAndSlots()
+  }, [userRole, userId])
 
   const handleZoneNameChange = (event) => {
     setSelectedZoneName(event.target.value)
   }
 
   const handleAvailabilityChange = (event) => {
-    const selectedAvailability = event.target.value
-    setSelectedAvailability(
-      selectedAvailability === "" ? null : selectedAvailability === "true"
-    )
+    setSelectedAvailability(event.target.value)
   }
 
   const handleSlotChange = (event) => {
     setSelectedSlot(event.target.value)
   }
 
-  const filterSlots = (slots) => {
-    return slots.filter(
-      (slot) =>
-        (selectedZoneName === "" || slot.zone === selectedZoneName) &&
-        (selectedAvailability === null ||
-          slot.available === (selectedAvailability === "true")) &&
-        (selectedSlot === "" || slot.slot_number === parseInt(selectedSlot))
-    )
+  const filterSlots = () => {
+    return availableParkingSlots.filter((slot) => {
+      const matchesZone =
+        selectedZoneName === "" ||
+        zones.find((zone) => zone.id === slot.zone)?.name === selectedZoneName
+      const matchesAvailability =
+        selectedAvailability === "" ||
+        slot.available.toString() === selectedAvailability
+      const matchesSlot =
+        selectedSlot === "" || slot.slot_number === parseInt(selectedSlot)
+      return matchesZone && matchesAvailability && matchesSlot
+    })
   }
 
-  const filterZones = (zones, selectedZoneName) => {
-    if (!selectedZoneName) return zones
-    return zones.filter((zone) => zone.name === selectedZoneName)
-  }
+  const filteredSlots = filterSlots()
 
-  const generateParkingTicket = async () => {
-    const selectedZoneObj = zones.find((zone) => zone.name === selectedZoneName)
-    const zoneNumber = selectedZoneObj ? selectedZoneObj.park_owner : null
-
-    const ticket = {
-      zone: zoneNumber,
-      time_slot: 1,
-      vehicle: {
-        plate_number: "ABC123",
-        mobile_no: "1234567890",
-      },
+  const groupedParkingSlots = zones.reduce((acc, zone) => {
+    const zoneSlots = filteredSlots.filter((slot) => slot.zone === zone.id)
+    if (zoneSlots.length > 0) {
+      acc[zone.name] = zoneSlots
     }
-
-    try {
-      const response = await fetch(
-        "https://parkspotter-backened.onrender.com/accounts/bookings/",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(ticket),
-        }
-      )
-
-      if (!response.ok) {
-        toast.error("Error creating ticket")
-        throw new Error("Failed to create ticket")
-      }
-
-      const data = await response.json()
-      toast.success("Ticket created:", data)
-    } catch (error) {
-      toast.error("Error creating ticket:", error)
-    }
-  }
+    return acc
+  }, {})
 
   return (
     <div>
-      {/* <Title>Available Parking Slots</Title> */}
       <FilterContainer>
         <FilterSection>
           <div>
@@ -166,7 +180,7 @@ const AvailableParkingSlotTest = () => {
             <Select
               id="availability-select"
               onChange={handleAvailabilityChange}
-              value={selectedAvailability === null ? "" : selectedAvailability}
+              value={selectedAvailability}
             >
               <option value="">All</option>
               <option value="true">Available</option>
@@ -193,24 +207,24 @@ const AvailableParkingSlotTest = () => {
         </FilterItem>
       </FilterContainer>
 
-      {filterZones(Object.keys(groupedParkingSlots), selectedZoneName).map(
-        (zone) => (
-          <ZoneContainer key={zone}>
-            <ZoneTitle>Zone {zone}</ZoneTitle>
-            <BoardContainer>
-              {filterSlots(groupedParkingSlots[zone] || []).map(
-                (slot, index) => (
-                  <Column key={index}>
-                    <Slot available={slot.available} theme={theme}>
-                      {slot.available ? slot.slot_number : <img src={car} />}
-                    </Slot>
-                  </Column>
-                )
-              )}
-            </BoardContainer>
-          </ZoneContainer>
-        )
-      )}
+      {Object.keys(groupedParkingSlots).map((zone) => (
+        <ZoneContainer key={zone}>
+          <ZoneTitle>Zone {zone}</ZoneTitle>
+          <BoardContainer>
+            {groupedParkingSlots[zone].map((slot, index) => (
+              <Column key={index}>
+                <Slot available={slot.available} theme={theme}>
+                  {slot.available ? (
+                    slot.slot_number
+                  ) : (
+                    <img src={car} alt="car" />
+                  )}
+                </Slot>
+              </Column>
+            ))}
+          </BoardContainer>
+        </ZoneContainer>
+      ))}
     </div>
   )
 }

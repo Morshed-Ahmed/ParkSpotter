@@ -32,18 +32,32 @@ const SignIn = () => {
       const responseData = await response.json();
       console.log(responseData);
 
-      if (responseData.error) {
-        toast.error("Invalid credentials");
+      if (responseData.non_field_errors) {
+        toast.error(responseData.non_field_errors);
         setLoading(false);
-        throw new Error("Invalid credentials");
+        return;
       }
-      if (responseData.is_staff) {
-        localStorage.setItem("is_staff", responseData.is_staff);
-      }
-      localStorage.setItem("token", responseData.token);
-      localStorage.setItem("user_id", responseData.user_id);
 
-      navigate("/dashboard");
+      if (
+        responseData.role == "park_owner" ||
+        responseData.role == "employee"
+      ) {
+        localStorage.setItem("role", responseData.role);
+        localStorage.setItem("token", responseData.token);
+        localStorage.setItem("user_id", responseData.user_id);
+        console.log(responseData.role);
+        navigate("/dashboard");
+      } else {
+        const url = new URL(
+          "https://development-parkspotter-pwa.netlify.app/home"
+        );
+        url.searchParams.append("token", responseData.token);
+        url.searchParams.append("user_id", responseData.user_id);
+        url.searchParams.append("role", responseData.role);
+
+        // Navigate to the constructed URL
+        window.location.href = url.toString();
+      }
       toast.success("Login successful");
       setLoading(false);
     } catch (error) {
@@ -76,7 +90,7 @@ const SignIn = () => {
         <Header>Sign in</Header>
         <Form onSubmit={handleSubmit(onSubmit)}>
           <input
-            placeholder="Username"
+            placeholder="Email/Mobile No/Username"
             type="text"
             {...register("login", { required: true })}
             aria-invalid={errors.login ? "true" : "false"}

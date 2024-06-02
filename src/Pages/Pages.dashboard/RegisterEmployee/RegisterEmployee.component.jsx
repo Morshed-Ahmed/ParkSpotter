@@ -1,6 +1,7 @@
 import { useState } from "react";
 import {
   Button,
+  DateInput,
   Form,
   FormContainer,
   Input,
@@ -191,7 +192,7 @@ const EmployeeRegistrationForm = () => {
           />
 
           <Label htmlFor="joined_date">Joined Date</Label>
-          <Input
+          <DateInput
             type="datetime-local"
             id="joined_date"
             name="joined_date"

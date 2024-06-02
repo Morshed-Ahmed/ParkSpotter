@@ -1,4 +1,6 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
+import axios from "axios";
 import {
   FaCar,
   FaTicketAlt,
@@ -18,28 +20,28 @@ import {
 } from "./UnpaidTickets.styled";
 
 const UnpaidTickets = () => {
-  const tickets = [
-    {
-      number: "12345",
-      carMake: "Toyota",
-      carNumberPlate: "ABC123",
-      date: "2023-05-15",
-      paymentAmount: "50.00",
-    },
-    {
-      number: "67890",
-      carMake: "Honda",
-      carNumberPlate: "XYZ789",
-      date: "2023-05-16",
-      paymentAmount: "30.00",
-    },
-    // Add more tickets as needed
-  ];
 
+  const [tickets, setTickets] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
   const [minPrice, setMinPrice] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
+
+  useEffect(() => {
+    const fetchTickets = async () => {
+      try {
+        const response = await axios.get(
+          "https://parkspotter-backened.onrender.com/accounts/bookings/"
+        );
+        const unpaidTickets = response.data.filter((ticket) => !ticket.is_paid);
+        setTickets(unpaidTickets);
+      } catch (error) {
+        console.error("Error fetching tickets:", error);
+      }
+    };
+
+    fetchTickets();
+  }, []);
 
   const handlePriceChange = (e) => {
     const { name, value } = e.target;
@@ -51,11 +53,13 @@ const UnpaidTickets = () => {
   };
 
   const filteredTickets = tickets.filter((ticket) => {
-    const matchesSearch = (field) =>
-      ticket[field].toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = (field) => {
+      const fieldValue = field.split('.').reduce((o, i) => (o ? o[i] : undefined), ticket);
+      return fieldValue && fieldValue.toString().toLowerCase().includes(search.toLowerCase());
+    };
 
     const isWithinPriceRange = () => {
-      const price = parseFloat(ticket.paymentAmount);
+      const price = parseFloat(ticket.amount);
       const min = parseFloat(minPrice);
       const max = parseFloat(maxPrice);
       if (!isNaN(min) && price < min) return false;
@@ -65,10 +69,9 @@ const UnpaidTickets = () => {
 
     if (filter === "all") {
       return (
-        matchesSearch("number") ||
-        matchesSearch("carMake") ||
-        matchesSearch("carNumberPlate") ||
-        matchesSearch("date")
+        matchesSearch("ticket_no") ||
+        matchesSearch("vehicle.plate_number") ||
+        matchesSearch("check_in_time")
       );
     } else if (filter === "price") {
       return isWithinPriceRange();
@@ -92,10 +95,9 @@ const UnpaidTickets = () => {
         />
         <SelectInput value={filter} onChange={(e) => setFilter(e.target.value)}>
           <option value="all">All</option>
-          <option value="number">Ticket Number</option>
-          <option value="carMake">Car Make</option>
-          <option value="carNumberPlate">Car Number Plate</option>
-          <option value="date">Date</option>
+          <option value="ticket_no">Ticket Number</option>
+          <option value="vehicle.plate_number">Car Number Plate</option>
+          <option value="check_in_time">Date</option>
           <option value="price">Price Range</option>
         </SelectInput>
       </SearchContainer>
@@ -118,106 +120,36 @@ const UnpaidTickets = () => {
         </SearchContainer>
       )}
       <TicketList>
-        {filteredTickets.map((ticket, index) => (
-          <TicketItem key={index}>
+        {filteredTickets.map((ticket) => (
+          <TicketItem key={ticket.id}>
             <TicketInfo>
               <TicketDetail>
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    width: "70%",
-                  }}
-                >
-                  <FaTicketAlt style={{ marginRight: "10px" }} />
+                <span>
+                  <FaTicketAlt />
                   <span style={{ fontWeight: "bold" }}>Ticket No:</span>
                 </span>
-                <span
-                  style={{
-                    color: "coral",
-                    width: "30%",
-                    textAlign: "end",
-                    fontWeight: "bold",
-                  }}
-                >
-                  {ticket.number}
-                </span>
+                <span className="highlight">{ticket.ticket_no}</span>
               </TicketDetail>
               <TicketDetail>
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    width: "70%",
-                  }}
-                >
-                  <FaCar style={{ marginRight: "10px" }} />
-                  <span
-                    style={{ fontWeight: "bold", justifySelf: "flex-start" }}
-                  >
-                    Car Make:
-                  </span>
+                <span>
+                  <FaCar />
+                  <span style={{ fontWeight: "bold" }}>Car Number Plate:</span>
                 </span>
-                <span style={{ width: "30%", textAlign: "end" }}>
-                  {ticket.carMake}
-                </span>
+                <span>{ticket.vehicle.plate_number}</span>
               </TicketDetail>
               <TicketDetail>
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    width: "70%",
-                  }}
-                >
-                  <FaCar style={{ marginRight: "10px" }} />
-                  <span style={{ fontWeight: "bold" }}>Number Plate:</span>
-                </span>
-                <span style={{ width: "30%", textAlign: "end" }}>
-                  {ticket.carNumberPlate}
-                </span>
-              </TicketDetail>
-              <TicketDetail>
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    width: "50%",
-                  }}
-                >
-                  <FaCalendarAlt style={{ marginRight: "10px" }} />
+                <span>
+                  <FaCalendarAlt />
                   <span style={{ fontWeight: "bold" }}>Date:</span>
                 </span>
-                <span style={{ width: "50%", textAlign: "end" }}>
-                  {ticket.date}
-                </span>
+                <span>{new Date(ticket.check_in_time).toLocaleDateString()}</span>
               </TicketDetail>
               <TicketDetail>
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                    width: "70%",
-                  }}
-                >
-                  <FaMoneyBillAlt style={{ marginRight: "10px" }} />
+                <span>
+                  <FaMoneyBillAlt />
                   <span style={{ fontWeight: "bold" }}>Payment Amount:</span>
                 </span>
-                <span
-                  style={{
-                    width: "30%",
-                    textAlign: "end",
-                    color: "coral",
-                    fontWeight: "bold",
-                  }}
-                >
-                  ${ticket.paymentAmount}
-                </span>
+                <span className="highlight">${ticket.amount.toFixed(2)}</span>
               </TicketDetail>
             </TicketInfo>
           </TicketItem>

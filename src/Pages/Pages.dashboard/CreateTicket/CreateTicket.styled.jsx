@@ -12,6 +12,20 @@ export const Container = styled.div`
   @media (max-width: 768px) {
     padding: 20px;
     margin: 20px;
+    max-width: 95%;
+    margin: 20px auto;
+  }
+  @media only screen and (min-width: 768px) {
+    max-width: 90%;
+    margin: 20px auto;
+  }
+  @media only screen and (min-width: 992px) {
+    max-width: 70%;
+    margin: 20px auto;
+  }
+  @media only screen and (min-width: 1200px) {
+    max-width: 50%;
+    margin: 20px auto;
   }
 `
 
@@ -25,8 +39,14 @@ export const Title = styled.h2`
   font-size: 1.2em;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   padding: 5px 7px;
-`
 
+  @media (max-width: 768px) {
+    width: 50%;
+  }
+  @media only screen and (min-width: 768px) {
+    width: 32%;
+  }
+`
 export const FormGroup = styled.div`
   margin-bottom: 20px;
 `
@@ -41,17 +61,16 @@ export const Input = styled.input`
   padding: 8px;
   border: none;
   border-radius: 5px;
-  background-color: #333;
-  color: #fff;
+  color: #202123;
+  border: 2px solid #ddd;
 `
 
 export const Select = styled.select`
   width: 100%;
   padding: 8px;
-  border: none;
   border-radius: 5px;
-  background-color: #333;
-  color: #fff;
+  color: #202123;
+  border: 2px solid #ddd;
 `
 
 export const Button = styled.button`
@@ -71,11 +90,6 @@ export const Button = styled.button`
 `
 
 export const TotalAmount = styled.div`
-  margin-top: 20px;
-  font-size: 18px;
-`
-
-export const StaticParkingNumber = styled.div`
   margin-top: 20px;
   font-size: 18px;
 `

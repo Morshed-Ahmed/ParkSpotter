@@ -37,6 +37,14 @@ export const FilterSection = styled.div`
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 24px;
+    div{
+      display: flex;
+      flex-direction: column;
+    }
+  }
 `
 
 export const FilterItem = styled.div`
@@ -44,6 +52,14 @@ export const FilterItem = styled.div`
   align-items: center;
   justify-content: flex-end;
   width: 100%;
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 24px;
+    div{
+      display: flex;
+      flex-direction: column;
+    }
+  }
 `
 
 export const Label = styled.label`
@@ -94,6 +110,7 @@ export const ZoneTitle = styled.h2`
 export const BoardContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  
 `
 
 export const Column = styled.div`
@@ -106,6 +123,9 @@ export const Column = styled.div`
   margin: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
   padding: 60px 0;
+  @media (max-width: 768px) {
+    margin: 0 auto;
+  }
 `
 
 export const Slot = styled.div`

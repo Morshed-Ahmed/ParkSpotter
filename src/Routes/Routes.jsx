@@ -43,6 +43,10 @@ export const router = createBrowserRouter([
     element: <DashboardRoutes />,
     children: [
       {
+        index: true,
+        element: <Statistics />,
+      },
+      {
         path: "CreateParkingTicket",
         element: <CreateTicket />,
       },
@@ -65,10 +69,6 @@ export const router = createBrowserRouter([
       {
         path: "EmployeeList",
         element: <EmployeeList />,
-      },
-      {
-        path: "Statistics",
-        element: <Statistics />,
       },
     ],
   },
