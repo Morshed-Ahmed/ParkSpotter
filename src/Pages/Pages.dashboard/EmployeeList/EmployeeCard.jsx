@@ -18,6 +18,12 @@ const Card = styled.div`
     transform: translateY(-10px);
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.39);
   }
+  @media (max-width: 768px) {
+    width: 100%;
+  }
+  @media only screen and (min-width: 768px) and (max-width: 992px){
+    flex: 40%;
+  }
 `;
 
 const ProfileImage = styled.img`
@@ -61,16 +67,16 @@ const EmployeeCard = ({ employee }) => {
   const handleDetailsClick = () => {
     navigate(`/employees/${employee?.username}`);
   };
-  // console.log(employee);
+  console.log(employee);
   return (
     <Card>
       <ProfileImage
         src={employee?.profile_image}
-        alt={`${employee?.employee?.first_name}${employee?.employee?.last_name}`}
+        alt={`${employee?.first_name}${employee?.last_name}`}
       />
       <EmployeeDetail>
-        <strong>Name:</strong> {employee?.employee?.first_name}{" "}
-        {employee?.employee?.last_name}
+        <strong>Name:</strong> {employee?.first_name}{" "}
+        {employee?.last_name}
       </EmployeeDetail>
       <EmployeeDetail>
         <strong>Mobile No:</strong> {employee?.mobile_no}{" "}

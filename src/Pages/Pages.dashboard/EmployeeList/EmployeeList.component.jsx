@@ -22,6 +22,7 @@ const FilterContainer = styled.div`
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   padding: 20px;
+  
 `;
 
 const FilterSection = styled.div`
@@ -30,6 +31,11 @@ const FilterSection = styled.div`
   align-items: center;
   margin-bottom: 20px;
   width: 100%;
+
+  @media (max-width: 768px) {
+  flex-direction: column;
+  max-width: 100%;
+  }
 `;
 
 const Label = styled.label`
@@ -54,6 +60,10 @@ const Select = styled.select`
   &:focus {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   }
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+    width: 100%;
+    }
 `;
 
 const Input = styled.input`
@@ -70,6 +80,10 @@ const Input = styled.input`
   &:focus {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
   }
+  @media (max-width: 768px) {
+    margin-bottom: 20px;
+    width: 100%;
+    }
 `;
 
 const SalaryFilterSection = styled.div`
@@ -155,6 +169,34 @@ const employeesData = [
     address: "456 Elm St",
     salary: 60000,
     profile_image: "https://via.placeholder.com/100", // Sample image URL
+  },
+  {
+    mobile_no: "987-654-3210",
+    username: "Jafor Bhai",
+    confirm_password: "password456",
+    password: "password456",
+    first_name: "Jafor",
+    last_name: "Bhai",
+    joined_date: "2023-03-20",
+    qualification: "Master's Degree",
+    nid_card_no: "1234567890",
+    address: "456 Elm St",
+    salary: 60000,
+    profile_image: "https://via.placeholder.com/100",
+  },
+  {
+    mobile_no: "987-654-3210",
+    username: "Jafor Bhai",
+    confirm_password: "password456",
+    password: "password456",
+    first_name: "Jafor",
+    last_name: "Bhai",
+    joined_date: "2023-03-20",
+    qualification: "Master's Degree",
+    nid_card_no: "1234567890",
+    address: "456 Elm St",
+    salary: 60000,
+    profile_image: "https://via.placeholder.com/100",
   },
   {
     mobile_no: "987-654-3210",
