@@ -63,14 +63,14 @@ export const Title = styled.h1`
   }
 `;
 
-
 export const Label = styled.label`
   margin-bottom: 10px;
   font-weight: bold;
 `;
 
 export const Input = styled.input`
-  padding: 8px;
+  ${
+    "" /* padding: 8px;
   margin-bottom: 20px;
   border-radius: 8px;
   border: 2px solid #ccc;
@@ -98,7 +98,14 @@ export const Input = styled.input`
   @media (max-width: 576px) {
     padding: 8px;
     font-size: 0.7em;
+  } */
   }
+
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 5px;
 `;
 
 export const DateInput = styled(Input)`
@@ -107,7 +114,21 @@ export const DateInput = styled(Input)`
   }
 `;
 export const Button = styled.button`
-  background-color: coral;
+  width: 100%;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 5px;
+
+  &:hover {
+    background-color: #218838;
+  }
+  ${
+    "" /* background-color: coral;
   color: #ffffff;
   padding: 15px;
   border: none;
@@ -140,5 +161,6 @@ export const Button = styled.button`
   @media (max-width: 576px) {
     width: 80%;
     padding: 8px;
+  } */
   }
 `;

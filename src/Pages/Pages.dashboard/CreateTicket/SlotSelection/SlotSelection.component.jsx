@@ -8,6 +8,7 @@ const SlotGrid = styled.div`
 
 const Slot = styled.div`
   padding: 10px;
+  border-radius: 10px;
   background-color: ${(props) =>
     props.available ? (props.selected ? "#4CAF50" : "#90EE90") : "#202123"};
   border: 1px solid #ccc;

@@ -1,18 +1,86 @@
 import { useState, useEffect } from "react";
-import {
-  Button,
-  Container,
-  FormGroup,
-  Input,
-  Label,
-  Select,
-  Title,
-  TotalAmount,
-} from "./CreateTicket.styled";
+
 import SlotSelector from "./SlotSelection/SlotSelection.component";
 import toast from "react-hot-toast";
 import { formatDateTime } from "./Util/formatDateTime";
-import { json } from "react-router-dom";
+import styled from "styled-components";
+
+const Container = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+`;
+const Form = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+`;
+
+const FormLeft = styled.div`
+  flex: 1;
+  min-width: 250px;
+`;
+
+const FormRight = styled.div`
+  flex: 1;
+  min-width: 250px;
+  margin-top: 20px;
+
+  @media (min-width: 768px) {
+    margin-left: 20px;
+    margin-top: 0;
+  }
+`;
+
+const FormGroup = styled.div`
+  margin-bottom: 15px;
+`;
+
+const Label = styled.label`
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+`;
+
+const Input = styled.input`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const Select = styled.select`
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
+
+const Button = styled.button`
+  width: 100%;
+  padding: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+
+  &:hover {
+    background-color: #218838;
+  }
+`;
 
 function CreateTicket() {
   const [vehicle, setVehicle] = useState("");
@@ -167,73 +235,82 @@ function CreateTicket() {
   });
 
   return (
-    <>
-      <Title>Create Ticket</Title>
-      <Container>
-        <FormGroup>
-          <Label>Car Number</Label>
-          <Input
-            placeholder="Car number"
-            type="text"
-            value={vehicle}
-            onChange={(e) => setVehicle(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label>Phone Number</Label>
-          <Input
-            placeholder="Phone Number"
-            type="text"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label>Parking Zone</Label>
-          <Select
-            value={selectedZone}
-            onChange={(e) => setSelectedZone(e.target.value)}
-          >
-            <option value="">Select Zone</option>
-            {zones.map((zone) => (
-              <option key={zone.id} value={zone.name}>
-                {zone.name}
-              </option>
-            ))}
-          </Select>
-        </FormGroup>
-        <FormGroup>
-          <Label>Check-In Time</Label>
-          <Input
-            type="datetime-local"
-            value={checkInTime}
-            onChange={(e) => setCheckInTime(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label>Approximate Checkout Time</Label>
-          <Input
-            type="datetime-local"
-            value={checkoutTime}
-            onChange={(e) => setCheckoutTime(e.target.value)}
-          />
-        </FormGroup>
-        <FormGroup>
-          <Label>Select Slot</Label>
-          <SlotSelector
-            slots={filteredSlots}
-            selectedSlot={selectedSlot}
-            onSlotSelect={(slot) => setSelectedSlot(slot)}
-          />
-        </FormGroup>
-        <TotalAmount>
-          Total Amount:{" "}
-          <span style={{ fontWeight: "bold" }}>{totalAmount}tk</span>
-        </TotalAmount>
-
-        <Button onClick={generateParkingTicket}>Generate Parking Ticket</Button>
-      </Container>
-    </>
+    <Container>
+      <h1 style={{ fontSize: "16px", marginBottom: "15px" }}>
+        Create Parking Ticket
+      </h1>
+      <Form>
+        <FormLeft>
+          <FormGroup>
+            <Label>Car Number</Label>
+            <Input
+              placeholder="Car number"
+              type="text"
+              value={vehicle}
+              onChange={(e) => setVehicle(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label>Phone Number</Label>
+            <Input
+              placeholder="Phone Number"
+              type="text"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label>Check-In Time</Label>
+            <Input
+              type="datetime-local"
+              value={checkInTime}
+              onChange={(e) => setCheckInTime(e.target.value)}
+            />
+          </FormGroup>
+          <FormGroup>
+            <Label>Approximate Checkout Time</Label>
+            <Input
+              type="datetime-local"
+              value={checkoutTime}
+              onChange={(e) => setCheckoutTime(e.target.value)}
+            />
+          </FormGroup>
+        </FormLeft>
+        <FormRight>
+          <FormGroup>
+            <Label>Parking Zone</Label>
+            <Select
+              value={selectedZone}
+              onChange={(e) => setSelectedZone(e.target.value)}
+            >
+              <option value="">Select Zone</option>
+              {zones.map((zone) => (
+                <option key={zone.id} value={zone.name}>
+                  {zone.name}
+                </option>
+              ))}
+            </Select>
+          </FormGroup>
+          <FormGroup>
+            <Label>Select Slot</Label>
+            <SlotSelector
+              slots={filteredSlots}
+              selectedSlot={selectedSlot}
+              onSlotSelect={(slot) => setSelectedSlot(slot)}
+            />
+          </FormGroup>
+          <FormGroup>
+            Total Amount:{" "}
+            <span style={{ fontWeight: "bold" }}>{totalAmount}tk</span>
+          </FormGroup>
+          <FormGroup>
+            <Button onClick={generateParkingTicket}>
+              Generate Parking Ticket
+            </Button>
+          </FormGroup>
+        </FormRight>
+      </Form>
+    </Container>
   );
 }
 

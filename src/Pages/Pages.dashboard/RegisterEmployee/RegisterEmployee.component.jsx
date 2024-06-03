@@ -101,7 +101,9 @@ const EmployeeRegistrationForm = () => {
 
   return (
     <>
-      <Title>Register Employee</Title>
+      <h1 style={{ textAlign: "center", fontSize: "16px", marginTop: "20px" }}>
+        Register Employee
+      </h1>
       <FormContainer>
         <Form onSubmit={handleSubmit}>
           <Label htmlFor="mobile_no">Mobile No</Label>
