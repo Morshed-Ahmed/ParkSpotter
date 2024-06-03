@@ -80,18 +80,24 @@ export const ButtonContainer = styled.div`
   display: flex;
   gap: 10px;
   margin-top: 20px;
+  width: 400px;
+  margin: auto;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 export const EditButton = styled.button`
   padding: 10px 20px;
   font-size: 16px;
   color: #fff;
-  background-color: #007bff;
+  background-color: #28a745;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   &:hover {
-    background-color: #0056b3;
+    background-color: #218838;
   }
 `;
 
