@@ -1,10 +1,10 @@
-import styled from "styled-components"
+import styled from "styled-components";
 
 export const theme = {
   primaryColor: "#202123",
   secondaryColor: "#ffffff",
   complementaryColor: "coral",
-}
+};
 
 export const Title = styled.h1`
   text-align: center;
@@ -16,88 +16,37 @@ export const Title = styled.h1`
   padding: 5px 0;
   font-size: 1.2em;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-`
+`;
 
 export const FilterContainer = styled.div`
-  text-align: center;
-  margin-bottom: 20px;
   display: flex;
-  align-items: flex-start;
+  flex-direction: row;
   justify-content: space-between;
-  gap: 25px;
-  flex-direction: column;
-  margin: 20px 35px;
-  padding: 24px;
-  border-radius: 19px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-`
-
-export const FilterSection = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
+  padding: 25px;
   @media (max-width: 768px) {
     flex-direction: column;
-    gap: 24px;
-    div{
-      display: flex;
-      flex-direction: column;
-    }
   }
-`
-
-export const FilterItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  width: 100%;
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 24px;
-    div{
-      display: flex;
-      flex-direction: column;
-    }
-  }
-`
-
-export const Label = styled.label`
-  font-weight: bold;
-  margin-right: 10px;
-  color: #202123;
-  font-size: 1rem;
-  text-transform: uppercase;
-`
+`;
 
 export const Input = styled.input`
-  padding: 5px 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  border-radius: 15px;
-  border: 4px solid #202123;
-  background-color: #202123;
-  color: #ffffff;
-  font-size: 0.8rem;
-  outline: none;
-`
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
 
 export const Select = styled.select`
-  padding: 5px 12px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
-  border-radius: 15px;
-  border: 4px solid #202123;
-  margin-right: 20px;
-  background-color: #202123;
-  color: #ffffff;
-  font-size: 0.8rem;
-  outline: none;
-`
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+`;
 
 export const ZoneContainer = styled.div`
   background-color: #ffffff;
   padding: 0px 25px 50px 25px;
   display: ${({ isHidden }) => (isHidden ? "none" : "block")};
-`
+`;
 
 export const ZoneTitle = styled.h2`
   margin: 30px 0;
@@ -105,16 +54,15 @@ export const ZoneTitle = styled.h2`
   font-weight: bold;
   text-align: start;
   margin-bottom: 35px;
-`
+`;
 
 export const BoardContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
-  
-`
+`;
 
 export const Column = styled.div`
-//   width: calc(100% / 6);
+  //   width: calc(100% / 6);
   width: 140px;
   display: flex;
   flex-direction: column;
@@ -126,7 +74,7 @@ export const Column = styled.div`
   @media (max-width: 768px) {
     margin: 0 auto;
   }
-`
+`;
 
 export const Slot = styled.div`
   width: 80px;
@@ -142,8 +90,9 @@ export const Slot = styled.div`
   color: ${({ theme }) => theme.secondaryColor};
   cursor: ${({ available }) => (available ? "pointer" : "not-allowed")};
   transition: background-color 0.3s ease;
+  position: relative;
 
   &:hover {
     background-color: ${({ theme }) => theme.complementaryColor};
   }
-`
+`;

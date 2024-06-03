@@ -25,19 +25,13 @@ const FilterContainer = styled.div`
 const Input = styled.input`
   width: 100%;
   padding: 10px;
-  margin-top: 10px;
-  font-size: 16px;
-  border: 2px solid #202123;
-  border-radius: 4px;
-  // box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
-  outline: none;
-  background-color: #202123;
-  color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 `;
 
 const RefreshButton = styled.button`
   padding: 6px 10px;
-  background-color: #202123;
+  background-color: #28a745;
   color: #ffffff;
   border: none;
   border-radius: 99px;
@@ -48,7 +42,7 @@ const RefreshButton = styled.button`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #ff6f61;
+    background-color: #218838;
   }
 `;
 
@@ -302,7 +296,10 @@ const TicketPayment = () => {
   return (
     <Container>
       <FilterContainer>
-        <label style={{ fontWeight: "bold" }} htmlFor="ticket-number">
+        <label
+          style={{ fontWeight: "bold", marginBottom: "5px" }}
+          htmlFor="ticket-number"
+        >
           Enter Ticket Number:
         </label>
         <Input
