@@ -36,7 +36,7 @@ const TicketPayment = () => {
           const unpaidBookings = bookings.filter(booking => !booking.is_paid && zoneIds.includes(booking.zone));
           setTickets(unpaidBookings);
         }
-      } else if (role === "park_owner") {
+      } else if (role === "parkowner") {
         const zoneResponse = await fetch(`https://parkspotter-backened.onrender.com/accounts/zone/?park_owner=${userId}`, {
           headers: {
             "Content-Type": "application/json",
@@ -253,25 +253,31 @@ const TicketPayment = () => {
                 <DetailItem>
                   <DetailLabel>Fine Calculation:</DetailLabel>
                   <DetailValue>
-                    20 BDT + {fineDetails.overtimeMinutes} BDT ={" "}
-                    {fineDetails.fine} BDT
+                    20 BDT + {fineDetails.overtimeMinutes} (Overtime Minutes)
                   </DetailValue>
                 </DetailItem>
-                <FineAlert>Fine: {fineDetails.fine} BDT</FineAlert>
+                <DetailItem>
+                  <DetailLabel>Total Fine:</DetailLabel>
+                  <DetailValue>{fineDetails.fine} BDT</DetailValue>
+                </DetailItem>
+                <FineAlert>
+                  Note: A fine of {fineDetails.fine} BDT has been issued for not
+                  picking up the car on time.
+                </FineAlert>
               </>
             )}
             <DetailItem>
-              <DetailLabel>Total Amount:</DetailLabel>
-              <DetailValue>{totalAmount} BDT</DetailValue>
+              <DetailLabel>Total Amount Due:</DetailLabel>
+              <DetailValue>{totalAmount.toFixed(2)} BDT</DetailValue>
             </DetailItem>
           </DetailSection>
-          {!filteredTicket.is_paid && (
-            <PaymentContainer>
-              <PaymentButton onClick={handlePayment}>
-                Pay Now
-              </PaymentButton>
-            </PaymentContainer>
-          )}
+          <PaymentContainer>
+            <Dropdown>
+              <option value="cash">Cash</option>
+              <option value="card">Card</option>
+            </Dropdown>
+            <PaymentButton onClick={handlePayment}>Pay Now</PaymentButton>
+          </PaymentContainer>
         </TicketContainer>
       )}
     </Container>
