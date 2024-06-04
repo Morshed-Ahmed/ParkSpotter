@@ -15,6 +15,7 @@ import EmployeeList from "../Pages/Pages.dashboard/EmployeeList/EmployeeList.com
 import Statistics from "../Pages/Pages.dashboard/Statistics/Statistics.component";
 import DemoDashboard from "../Pages/Pages.DemoDashboard/DemoDashboard";
 import Zones from "../Pages/Pages.dashboard/Zones/Zones.component";
+import ParkOwnerLocation from "../Pages/Pages.dashboard/ParkOwnerLocation/ParkOwnerLocation.component";
 
 export const router = createBrowserRouter([
   {
@@ -74,6 +75,10 @@ export const router = createBrowserRouter([
       {
         path: "Zones",
         element: <Zones />,
+      },
+      {
+        path: "ParkOwnerLocation",
+        element: <ParkOwnerLocation />,
       },
     ],
   },

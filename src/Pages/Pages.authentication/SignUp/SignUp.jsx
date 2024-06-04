@@ -20,37 +20,13 @@ import {
   StyledInput,
   StyledTextArea,
   SubmitButton,
-  ModalBackground,
-  ModalContent,
-  CloseButton,
   TabContainer,
   Tab,
   TabContent,
-  Price,
-  Description,
-  Title,
-  SubscriptionCard,
-  SubscriptionCardsContainer,
 } from "./SignUp.styles";
 import CustomerSignUp from "./CustomerSignUp";
-import { CiHome } from "react-icons/ci";
 import { TiHomeOutline } from "react-icons/ti";
-import { setSubscriptionAmount } from "../../../store/payment/payment.reducer";
-import { IoIosCloseCircleOutline } from "react-icons/io";
-
-
-const CustomModal = ({ isOpen, onClose, children }) => {
-  return (
-    <ModalBackground isModalOpen={isOpen} onClick={onClose}>
-      <ModalContent isModalOpen={isOpen} onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={onClose}>
-          <IoIosCloseCircleOutline size={"30"} />
-        </CloseButton>
-        {children}
-      </ModalContent>
-    </ModalBackground>
-  );
-};
+import SubscriptionModal from "./SubscriptionModal.component";
 
 const SignUp = () => {
   const navigate = useNavigate();
@@ -97,21 +73,6 @@ const SignUp = () => {
   };
   const closeModal = () => {
     setModalOpen(false);
-  };
-
-  // const dispatch = useDispatch();
-  // const navigate = useNavigate();
-
-  const handlePrice = (priceString) => {
-    const priceNumeric = parseFloat(priceString.replace("$", ""));
-    dispatch(setSubscriptionAmount(priceNumeric));
-    const is_staff = localStorage.getItem("is_staff");
-    if (!is_staff) {
-      navigate("/payment");
-    } else {
-      setModalOpen(false);
-      // navigate("/payment");
-    }
   };
 
   return (
@@ -353,33 +314,7 @@ const SignUp = () => {
                 </p>
               </StyledFormBody>
 
-              <div>
-                <CustomModal isOpen={modalOpen} onClose={closeModal}>
-                  <SubscriptionCardsContainer>
-                    <SubscriptionCard onClick={() => handlePrice("$9.99")}>
-                      <Title>1 Month Plan</Title>
-                      <Description>
-                        Access to basic features for 1 month
-                      </Description>
-                      <Price>$9.99</Price>
-                    </SubscriptionCard>
-                    <SubscriptionCard onClick={() => handlePrice("$49.99")}>
-                      <Title>6 Month Plan</Title>
-                      <Description>
-                        Access to basic features for 6 months
-                      </Description>
-                      <Price>$49.99</Price>
-                    </SubscriptionCard>
-                    <SubscriptionCard onClick={() => handlePrice("$89.99")}>
-                      <Title>1 Year Plan</Title>
-                      <Description>
-                        Access to basic features for 1 year
-                      </Description>
-                      <Price>$89.99</Price>
-                    </SubscriptionCard>
-                  </SubscriptionCardsContainer>
-                </CustomModal>
-              </div>
+              <SubscriptionModal isOpen={modalOpen} onClose={closeModal} />
             </TabContent>
           )}
           {activeTab === "tab2" && (
