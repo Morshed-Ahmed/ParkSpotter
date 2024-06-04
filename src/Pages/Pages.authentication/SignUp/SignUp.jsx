@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setRegistrationField } from "../../../store/registration/registration.reducer";
+import { setPaymentDate } from "../../../store/payment/payment.reducer"; // Import the setPaymentDate action
 import {
   FormContainer,
   FlexContainer,
@@ -41,28 +42,15 @@ const SignUp = () => {
   const dispatch = useDispatch();
   password.current = watch("password", "");
 
-  const [zoneCount, setZoneCount] = useState(0);
-  const [zoneSlots, setZoneSlots] = useState([]);
-
-  const handleZoneCountChange = (e) => {
-    const count = parseInt(e.target.value, 10);
-    setZoneCount(count);
-    setZoneSlots(new Array(count).fill(0));
-  };
-
-  const handleZoneSlotChange = (index, value) => {
-    const newZoneSlots = [...zoneSlots];
-    newZoneSlots[index] = parseInt(value, 10);
-    setZoneSlots(newZoneSlots);
-  };
-
   const [modalOpen, setModalOpen] = useState(false);
 
   const onSubmit = (data) => {
-    data.nid_card_no = 12345678901;
-    data.zones = zoneSlots;
+    data.slot_size = 0;
+    data.capacity = 0;
+    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
+    data.payment_date = today; // Add payment_date to the form data
     dispatch(setRegistrationField(data));
-    // navigate("/payment");
+    dispatch(setPaymentDate(today)); // Dispatch setPaymentDate action with today's date
     setModalOpen(true);
   };
 
@@ -230,34 +218,6 @@ const SignUp = () => {
                 </FlexContainer>
                 <FlexContainer>
                   <InputContainer>
-                    <StyledInput
-                      placeholder="Slot size"
-                      type="number"
-                      {...register("slot_size", { required: true })}
-                      aria-invalid={errors.slot_size ? "true" : "false"}
-                    />
-                    {errors.slot_size?.type === "required" && (
-                      <AlertMessage role="alert">
-                        Slot size is required
-                      </AlertMessage>
-                    )}
-                  </InputContainer>
-                  <InputContainer>
-                    <StyledInput
-                      placeholder="Capacity"
-                      type="number"
-                      {...register("capacity", { required: true })}
-                      aria-invalid={errors.capacity ? "true" : "false"}
-                    />
-                    {errors.capacity?.type === "required" && (
-                      <AlertMessage role="alert">
-                        Capacity is required
-                      </AlertMessage>
-                    )}
-                  </InputContainer>
-                </FlexContainer>
-                <FlexContainer>
-                  <InputContainer>
                     <StyledTextArea
                       placeholder="Address"
                       rows="3"
@@ -283,29 +243,30 @@ const SignUp = () => {
                   </InputContainer>
                 </FlexContainer>
 
-                {/* Zone Input Fields */}
+                {/* New NID Card NO Input Field */}
                 <FullWidthInputBox>
                   <StyledInput
-                    placeholder="Number of zones"
-                    type="number"
-                    value={zoneCount}
-                    onChange={handleZoneCountChange}
-                    aria-invalid={errors.zones ? "true" : "false"}
+                    placeholder="NID Card NO"
+                    type="text"
+                    {...register("nid_card_no", { required: true })}
+                    aria-invalid={errors.nid_card_no ? "true" : "false"}
                   />
+                  {errors.nid_card_no?.type === "required" && (
+                    <AlertMessage role="alert">
+                      NID Card NO is required
+                    </AlertMessage>
+                  )}
                 </FullWidthInputBox>
 
-                {zoneSlots.map((slot, index) => (
-                  <FullWidthInputBox key={index}>
-                    <StyledInput
-                      placeholder={`Slots in zone ${index + 1}`}
-                      type="number"
-                      value={zoneSlots[index]}
-                      onChange={(e) =>
-                        handleZoneSlotChange(index, e.target.value)
-                      }
-                    />
-                  </FullWidthInputBox>
-                ))}
+                {/* Payment Date Field */}
+                <FullWidthInputBox>
+                  <StyledInput
+                    placeholder="Payment Date"
+                    type="date"
+                    value={new Date().toISOString().split("T")[0]}
+                    readOnly
+                  />
+                </FullWidthInputBox>
 
                 <SubmitButton type="submit" value="Create Account" />
                 <p style={{ marginTop: "10px" }}>

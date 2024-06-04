@@ -12,7 +12,7 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 40px 20px;
+  padding: 20px 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Helvetica Neue", Arial, sans-serif;
   background-color: #f5f5f7;
@@ -37,7 +37,7 @@ const FormContainer = styled.div`
 
 const Input = styled.input`
   padding: 10px 15px;
-  width: 200px;
+  width: 15%;
   border: 1px solid #ccc;
   border-radius: 8px;
   outline: none;
@@ -46,11 +46,15 @@ const Input = styled.input`
   &:focus {
     border-color: #007bff;
   }
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `
 
 const Button = styled.button`
   padding: 10px 20px;
-  background-color: #007bff;
+  background-color: #202123;
   color: white;
   border: none;
   border-radius: 8px;
@@ -70,10 +74,12 @@ const Button = styled.button`
 
 const SmallButton = styled(Button)`
   padding: 5px 10px;
+  font-size: 12px;
+  border-radius: 99px;
 `
 
 const MapContainer = styled.div`
-  width: 100%;
+  width: 90%;
   max-width: 1200px;
   height: 600px;
   border-radius: 8px;
@@ -88,19 +94,19 @@ const MapContainer = styled.div`
 const Tooltip = styled.span`
   visibility: hidden;
   width: 140px;
-  background-color: black;
-  color: white;
+  background-color: #fff;
+  color: #aaa;
   text-align: center;
   border-radius: 6px;
-  padding: 5px;
+  padding: 10px;
   position: absolute;
   z-index: 1;
-  bottom: 125%;
-  left: 50%;
+  top: 50%;
+  right: 0%;
   margin-left: -70px;
   opacity: 0;
   transition: opacity 0.3s;
-
+  font-size: 12px;
   &::after {
     content: "";
     position: absolute;
@@ -160,7 +166,7 @@ const ParkOwnerLocation = () => {
           setParkOwnersCurrentData(parkOwnerData)
 
           const mapCenter =
-            latitude && longitude ? [longitude, latitude] : [90.4125, 23.8103] // Default to Dhaka
+            latitude && longitude ? [longitude, latitude] : [90.4125, 23.8103] 
 
           const map = new mapboxgl.Map({
             container: "map",
@@ -289,8 +295,8 @@ const ParkOwnerLocation = () => {
           <Tooltip>Update your parking lot's location</Tooltip>
         </ButtonContainer>
         <ButtonContainer>
-          <SmallButton onClick={handleRefresh}>Refresh Map</SmallButton>
-          <Tooltip>Refresh the map view</Tooltip>
+          <SmallButton onClick={handleRefresh}>Remove Marker</SmallButton>
+          <Tooltip>Remove the last marker on the map</Tooltip>
         </ButtonContainer>
       </FormContainer>
       <MapContainer id="map"></MapContainer>

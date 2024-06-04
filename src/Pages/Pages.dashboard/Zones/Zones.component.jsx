@@ -24,7 +24,7 @@ const Sidebar = styled.div`
   padding: 20px;
   background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 
   @media (min-width: 768px) {
     margin-right: 40px;
@@ -37,7 +37,7 @@ const MainContent = styled.div`
   padding: 20px;
   background: #ffffff;
   border-radius: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 `
 
 const Title = styled.h1`
@@ -46,14 +46,7 @@ const Title = styled.h1`
   font-weight: 600;
   font-size: 26px;
   margin-bottom: 20px;
-`
-
-const Subtitle = styled.h2`
-  text-align: center;
-  color: #666;
-  font-weight: 400;
-  font-size: 18px;
-  margin-bottom: 20px;
+  margin-top: 20px;
 `
 
 const Form = styled.form`
@@ -329,7 +322,6 @@ const Zones = () => {
     <Container>
       <Sidebar>
         <Title>Create Zone</Title>
-        <Subtitle>Effortlessly manage your parking zones</Subtitle>
         <Form onSubmit={handleSubmit}>
           <Input
             type="text"
