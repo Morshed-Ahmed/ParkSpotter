@@ -13,8 +13,9 @@ import {
   selectPassword,
   selectSlotSize,
   selectUsername,
+  selectNidCardNo,
 } from "../../store/registration/registration.selector"
-import { selectSubscriptionAmount } from "../../store/payment/payment.selector"
+import { selectPaymentDateMemoized, selectPaymentTypeMemoized, selectSubscriptionAmount } from "../../store/payment/payment.selector"
 import { setPaymentType } from "../../store/payment/payment.reducer"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
@@ -54,10 +55,10 @@ const PaymentForm = () => {
   data.first_name = useSelector(selectFirstName)
   data.last_name = useSelector(selectLastName)
   data.mobile_no = useSelector(selectMobileNo)
-  data.nid_card_no = 12345678901
+  data.nid_card_no = useSelector(selectNidCardNo)
   data.password = useSelector(selectPassword)
-  data.payment_date = "2024-05-11"
-  data.payment_method = "stripe"
+  data.payment_date = useSelector(selectPaymentDateMemoized)
+  data.payment_method = useSelector(selectPaymentTypeMemoized)
   data.slot_size = useSelector(selectSlotSize)
   data.username = useSelector(selectUsername)
 

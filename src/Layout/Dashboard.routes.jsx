@@ -109,6 +109,8 @@ const Dashboard = () => {
           </MenuItem>
           <MenuItem to={"/dashboard/TicketPayment"} activeClassName="active">Ticket Payment</MenuItem>
           <MenuItem to={"/dashboard/EmployeeList"} activeClassName="active">Employee List</MenuItem>
+          <MenuItem to={"/dashboard/Zones"} activeClassName="active">Zones</MenuItem>
+          <MenuItem to={"/dashboard/ParkOwnerLocation"} activeClassName="active">Location</MenuItem>
         </MenuContainer>
         <OutletWrapper>
           <Outlet />

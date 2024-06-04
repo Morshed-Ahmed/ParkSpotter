@@ -13,7 +13,7 @@ const tickets = [
       date: "2023-05-16",
       paymentAmount: "30.00",
     },
-    // Add more tickets as needed
+    
   ]
 
 

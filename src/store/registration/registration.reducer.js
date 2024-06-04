@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit"
 const REGISTRATION_INITIAL_STATE = {
   address: null,
   area: null,
-  capacity: null,
+  capacity: 0,
   confirm_password: null,
   email: null,
   first_name: null,
@@ -11,7 +11,7 @@ const REGISTRATION_INITIAL_STATE = {
   mobile_no: null,
   nid_card_no: 12345678901,
   password: null,
-  slot_size: null,
+  slot_size: 0,
   username: null,
 }
 

@@ -39,6 +39,7 @@ import {
   selectMinTickets,
   selectStartDate,
 } from "../../../store/FilterSlice/filterSlice"
+import LocationAndZoneWarning from "./LocationAndZoneWarning/LocationAndZoneWarning.component"
 
 ChartJS.register(
   CategoryScale,
@@ -499,7 +500,7 @@ const ChartComponent = () => {
       },
       {
         label: "Employee Expenses",
-        data: filteredData.employeeExpenses, // Added employee expenses
+        data: filteredData.employeeExpenses, 
         backgroundColor: "rgba(255,99,132,0.2)",
         borderColor: "rgba(255,99,132,1)",
         borderWidth: 1,
@@ -528,6 +529,7 @@ const ChartComponent = () => {
 
   return (
     <Container>
+      <LocationAndZoneWarning/>
       <FilterComponent>
         <Select value={chartType} onChange={handleChartTypeChange}>
           <option value="Line">Line Chart</option>
