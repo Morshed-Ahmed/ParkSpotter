@@ -11,6 +11,9 @@ export const selectPaymentType = (state) =>
 export const selectPaymentDate = (state) =>
   selectPaymentSlice(state).paymentDate;
 
+export const selectSubscriptionId = (state) =>
+  selectPaymentSlice(state).subscription_id;
+
 export const selectSubscriptionAmountMemoized = createSelector(
   [selectSubscriptionAmount],
   (subscriptionAmount) => subscriptionAmount
@@ -24,4 +27,9 @@ export const selectPaymentTypeMemoized = createSelector(
 export const selectPaymentDateMemoized = createSelector(
   [selectPaymentDate],
   (paymentDate) => paymentDate
+);
+
+export const selectSubscriptionIdMemoized = createSelector(
+  [selectSubscriptionId],
+  (subscription_id) => subscription_id
 );
