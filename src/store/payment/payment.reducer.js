@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const PAYMENT_INITIAL_STATE = {
   subscriptionAmount: null,
-  paymentType: null,
+  paymentType: "stripe",
   paymentDate: null,
 }
 

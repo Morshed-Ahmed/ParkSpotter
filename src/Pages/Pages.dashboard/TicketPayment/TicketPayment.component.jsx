@@ -1,162 +1,5 @@
 import { useState, useEffect } from "react";
-import styled, { keyframes } from "styled-components";
-
-const Container = styled.div`
-  padding: 20px;
-  background-color: #ffffff;
-  color: #202123;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-`;
-
-const FilterContainer = styled.div`
-  margin-bottom: 20px;
-  width: 100%;
-  max-width: 600px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 10px 50px;
-  border-radius: 7px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.39);
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-`;
-
-const RefreshButton = styled.button`
-  padding: 6px 10px;
-  background-color: #28a745;
-  color: #ffffff;
-  border: none;
-  border-radius: 99px;
-  font-size: 12px;
-  cursor: pointer;
-  margin-left: auto;
-  margin-top: 5px;
-  transition: background-color 0.3s ease;
-
-  &:hover {
-    background-color: #218838;
-  }
-`;
-
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-`;
-
-const PaidStatus = styled.span`
-  color: ${(props) => (props.paid ? "green" : "red")};
-  font-weight: bold;
-  animation: ${fadeIn} 0.5s ease-in-out;
-`;
-
-const TicketContainer = styled.div`
-  background: #ffffff;
-  color: #333;
-  padding: 20px;
-  border-radius: 15px;
-  max-width: 500px;
-  margin: 20px auto;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-  &:hover {
-    transform: scale(1.02);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-  }
-`;
-
-const TicketHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  border-bottom: 1px solid #ddd;
-  padding-bottom: 10px;
-`;
-
-const TicketNumber = styled.h2`
-  color: #007bff;
-  margin: 0;
-  font-size: 1.5em;
-`;
-
-const DetailSection = styled.div`
-  margin-bottom: 15px;
-`;
-
-const DetailItem = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-`;
-
-const DetailLabel = styled.span`
-  font-weight: bold;
-  color: #333;
-`;
-
-const DetailValue = styled.span`
-  color: #666;
-`;
-
-const FineAlert = styled.div`
-  background: #ffdddd;
-  color: #d8000c;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #d8000c;
-  margin-bottom: 20px;
-  text-align: center;
-  font-weight: bold;
-`;
-
-const PaymentContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 20px;
-`;
-
-const PaymentButton = styled.button`
-  background-color: #28a745;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transition: background-color 0.3s, box-shadow 0.3s;
-  &:hover {
-    background-color: #218838;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
-  }
-`;
-
-const Dropdown = styled.select`
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid #ced4da;
-  font-size: 16px;
-  background-color: #fff;
-  color: #333;
-  transition: border-color 0.3s;
-  &:focus {
-    border-color: #80bdff;
-    outline: none;
-  }
-`;
+import { Container, DetailItem, DetailLabel, DetailSection, DetailValue, Dropdown, FilterContainer, FineAlert, Input, PaidStatus, PaymentButton, PaymentContainer, RefreshButton, TicketContainer, TicketHeader, TicketNumber } from "./TicketPayment.styled";
 
 const TicketPayment = () => {
   const [tickets, setTickets] = useState([]);
@@ -167,13 +10,47 @@ const TicketPayment = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
 
   const fetchTickets = async () => {
+    const role = localStorage.getItem("role");
+    const userId = localStorage.getItem("user_id");
+    const token = localStorage.getItem("token");
+
     try {
-      const response = await fetch(
-        "https://parkspotter-backened.onrender.com/accounts/bookings/"
-      );
-      const data = await response.json();
-      const isPaidData = data.filter((ticket) => !ticket.is_paid);
-      setTickets(isPaidData);
+      if (role === "employee") {
+        const employeeResponse = await fetch("https://parkspotter-backened.onrender.com/accounts/employee-list/");
+        const employees = await employeeResponse.json();
+        const employee = employees.find(emp => emp.employee.id === parseInt(userId));
+        
+        if (employee) {
+          const parkOwnerId = employee.park_owner_id;
+          const zoneResponse = await fetch(`https://parkspotter-backened.onrender.com/accounts/zone/?park_owner=${parkOwnerId}`, {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Token ${token}`,
+            },
+          });
+          const zones = await zoneResponse.json();
+          const zoneIds = zones.map(zone => zone.id);
+
+          const bookingsResponse = await fetch("https://parkspotter-backened.onrender.com/accounts/bookings/");
+          const bookings = await bookingsResponse.json();
+          const unpaidBookings = bookings.filter(booking => !booking.is_paid && zoneIds.includes(booking.zone));
+          setTickets(unpaidBookings);
+        }
+      } else if (role === "parkowner") {
+        const zoneResponse = await fetch(`https://parkspotter-backened.onrender.com/accounts/zone/?park_owner=${userId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Token ${token}`,
+          },
+        });
+        const zones = await zoneResponse.json();
+        const zoneIds = zones.map(zone => zone.id);
+
+        const bookingsResponse = await fetch("https://parkspotter-backened.onrender.com/accounts/bookings/");
+        const bookings = await bookingsResponse.json();
+        const unpaidBookings = bookings.filter(booking => !booking.is_paid && zoneIds.includes(booking.zone));
+        setTickets(unpaidBookings);
+      }
     } catch (error) {
       console.error("Error fetching tickets:", error);
     }

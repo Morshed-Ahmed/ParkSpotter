@@ -230,7 +230,7 @@ const Navbar = () => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Token ${token}`, // Assuming you're using Token based auth
+        Authorization: `Token ${token}`, 
       },
     })
       .then((res) => {

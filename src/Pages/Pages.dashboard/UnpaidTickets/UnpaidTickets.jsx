@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import axios from "axios";
 import {
@@ -20,7 +19,6 @@ import {
 } from "./UnpaidTickets.styled";
 
 const UnpaidTickets = () => {
-
   const [tickets, setTickets] = useState([]);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState("all");
@@ -29,14 +27,62 @@ const UnpaidTickets = () => {
 
   useEffect(() => {
     const fetchTickets = async () => {
-      try {
-        const response = await axios.get(
-          "https://parkspotter-backened.onrender.com/accounts/bookings/"
-        );
-        const unpaidTickets = response.data.filter((ticket) => !ticket.is_paid);
-        setTickets(unpaidTickets);
-      } catch (error) {
-        console.error("Error fetching tickets:", error);
+      const role = localStorage.getItem("role");
+      const userId = localStorage.getItem("user_id");
+      const token = localStorage.getItem("token");
+
+      if (role === "employee") {
+        try {
+          const employeeListResponse = await axios.get(
+            "https://parkspotter-backened.onrender.com/accounts/employee-list/"
+          );
+          const employee = employeeListResponse.data.find(
+            (emp) => emp.employee.id.toString() === userId
+          );
+
+          if (employee) {
+            const parkOwnerId = employee.park_owner_id;
+            const zoneResponse = await axios.get(
+              `https://parkspotter-backened.onrender.com/accounts/zone/?park_owner=${parkOwnerId}`,
+              {
+                headers: { Authorization: `Token ${token}` },
+              }
+            );
+
+            const zoneIds = zoneResponse.data.map((zone) => zone.id);
+            const bookingsResponse = await axios.get(
+              "https://parkspotter-backened.onrender.com/accounts/bookings/"
+            );
+
+            const unpaidTickets = bookingsResponse.data.filter(
+              (ticket) => !ticket.is_paid && zoneIds.includes(ticket.zone)
+            );
+            setTickets(unpaidTickets);
+          }
+        } catch (error) {
+          console.error("Error fetching tickets for employee:", error);
+        }
+      } else if (role === "park_owner") {
+        try {
+          const zoneResponse = await axios.get(
+            `https://parkspotter-backened.onrender.com/accounts/zone/?park_owner=${userId}`,
+            {
+              headers: { Authorization: `Token ${token}` },
+            }
+          );
+          console.log(zoneResponse);
+          const zoneIds = zoneResponse.data.map((zone) => zone.id);
+          const bookingsResponse = await axios.get(
+            "https://parkspotter-backened.onrender.com/accounts/bookings/"
+          );
+
+          const unpaidTickets = bookingsResponse.data.filter(
+            (ticket) => !ticket.is_paid && zoneIds.includes(ticket.zone)
+          );
+          setTickets(unpaidTickets);
+        } catch (error) {
+          console.error("Error fetching tickets for park owner:", error);
+        }
       }
     };
 
