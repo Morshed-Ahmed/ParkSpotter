@@ -1,9 +1,9 @@
-import { useRef, useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { setRegistrationField } from "../../../store/registration/registration.reducer";
-import { setPaymentDate } from "../../../store/payment/payment.reducer"; // Import the setPaymentDate action
+import { useRef, useState, useEffect } from "react"
+import { useForm } from "react-hook-form"
+import { Link, useNavigate } from "react-router-dom"
+import { useDispatch } from "react-redux"
+import { setRegistrationField } from "../../../store/registration/registration.reducer"
+import { setPaymentDate } from "../../../store/payment/payment.reducer" // Import the setPaymentDate action
 import {
   FormContainer,
   FlexContainer,
@@ -24,44 +24,44 @@ import {
   TabContainer,
   Tab,
   TabContent,
-} from "./SignUp.styles";
-import CustomerSignUp from "./CustomerSignUp";
-import { TiHomeOutline } from "react-icons/ti";
-import SubscriptionModal from "./SubscriptionModal.component";
+} from "./SignUp.styles"
+import CustomerSignUp from "./CustomerSignUp"
+import { TiHomeOutline } from "react-icons/ti"
+import SubscriptionModal from "./SubscriptionModal/SubscriptionModal.component"
 
 const SignUp = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
   const {
     register,
     formState: { errors },
     handleSubmit,
     watch,
-  } = useForm();
+  } = useForm()
 
-  const password = useRef({});
-  const dispatch = useDispatch();
-  password.current = watch("password", "");
+  const password = useRef({})
+  const dispatch = useDispatch()
+  password.current = watch("password", "")
 
-  const [modalOpen, setModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false)
 
   const onSubmit = (data) => {
-    data.slot_size = 0;
-    data.capacity = 0;
-    const today = new Date().toISOString().split("T")[0]; // Get today's date in YYYY-MM-DD format
-    data.payment_date = today; // Add payment_date to the form data
-    dispatch(setRegistrationField(data));
-    dispatch(setPaymentDate(today)); // Dispatch setPaymentDate action with today's date
-    setModalOpen(true);
-  };
+    data.slot_size = 0
+    data.capacity = 0
+    const today = new Date().toISOString().split("T")[0] // Get today's date in YYYY-MM-DD format
+    data.payment_date = today // Add payment_date to the form data
+    dispatch(setRegistrationField(data))
+    dispatch(setPaymentDate(today)) // Dispatch setPaymentDate action with today's date
+    setModalOpen(true)
+  }
 
-  const [activeTab, setActiveTab] = useState("tab1");
+  const [activeTab, setActiveTab] = useState("tab1")
 
   const openModal = () => {
-    setModalOpen(true);
-  };
+    setModalOpen(true)
+  }
   const closeModal = () => {
-    setModalOpen(false);
-  };
+    setModalOpen(false)
+  }
 
   return (
     <Container>
@@ -287,7 +287,7 @@ const SignUp = () => {
         </div>
       </StyledFormContainer>
     </Container>
-  );
-};
+  )
+}
 
-export default SignUp;
+export default SignUp

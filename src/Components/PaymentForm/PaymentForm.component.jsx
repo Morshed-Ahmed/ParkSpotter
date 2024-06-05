@@ -15,7 +15,7 @@ import {
   selectUsername,
   selectNidCardNo,
 } from "../../store/registration/registration.selector"
-import { selectPaymentDateMemoized, selectPaymentTypeMemoized, selectSubscriptionAmount } from "../../store/payment/payment.selector"
+import { selectPaymentDateMemoized, selectPaymentTypeMemoized, selectSubscriptionAmount, selectSubscriptionIdMemoized } from "../../store/payment/payment.selector"
 import { setPaymentType } from "../../store/payment/payment.reducer"
 import toast from "react-hot-toast"
 import { useNavigate } from "react-router-dom"
@@ -61,6 +61,8 @@ const PaymentForm = () => {
   data.payment_method = useSelector(selectPaymentTypeMemoized)
   data.slot_size = useSelector(selectSlotSize)
   data.username = useSelector(selectUsername)
+  data.subscription_id = useSelector(selectSubscriptionIdMemoized)
+
 
   const paymentHandler = async (e, data) => {
     e.preventDefault()
