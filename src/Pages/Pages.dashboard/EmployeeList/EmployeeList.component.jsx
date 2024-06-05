@@ -1,17 +1,27 @@
 import styled from "styled-components";
 import EmployeeCard from "./EmployeeCard";
 import { useEffect, useState } from "react";
+import EmployeeDetailsModal from "./EmployeeDetailsModal";
+import EmployeePaymentModal from "./EmployeePaymentModal";
+import toast from "react-hot-toast";
 
 const Container = styled.div`
   padding: 20px;
+  ${
+    "" /* padding: 20px;
   background-color: #ffffff;
   color: #202123;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: center; */
+  }
 `;
 
 const FilterContainer = styled.div`
+  ${
+    "" /* display: flex;
+  justify-content: space-between;
+  flex-direction: row;
   margin-bottom: 20px;
   width: 100%;
   max-width: 800px;
@@ -21,36 +31,56 @@ const FilterContainer = styled.div`
   background: #202123;
   border-radius: 15px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
-  
+  padding: 20px; */
+  }
+
+  display:flex;
+  justify-content: space-between;
+  flex-direction: row;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const FilterSection = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 10px;
+  ${
+    "" /* display: flex;
   flex-direction: row;
   align-items: center;
   margin-bottom: 20px;
   width: 100%;
 
   @media (max-width: 768px) {
-  flex-direction: column;
-  max-width: 100%;
+    flex-direction: column;
+    max-width: 100%;
+  }  */
   }
 `;
 
 const Label = styled.label`
-  font-size: 18px;
+  ${
+    "" /* font-size: 18px;
   font-weight: bold;
   color: #202123;
-  margin-right: 10px;
+  margin-right: 10px; */
+  }
 `;
 
 const Select = styled.select`
-  padding: 12px;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  ${
+    "" /* padding: 12px;
   font-size: 14px;
   border: 2px solid #202123;
   border-radius: 8px;
-  margin-right: 10px;
+  margin-right: 10px; 
   outline: none;
   flex: 1;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -63,41 +93,30 @@ const Select = styled.select`
   @media (max-width: 768px) {
     margin-bottom: 20px;
     width: 100%;
-    }
+  } */
+  }
 `;
 
 const Input = styled.input`
-  padding: 12px;
-  font-size: 14px;
-  border: 2px solid #202123;
-  border-radius: 8px;
-  outline: none;
-  flex: 2;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.3s;
-
-  &:hover,
-  &:focus {
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-  }
-  @media (max-width: 768px) {
-    margin-bottom: 20px;
-    width: 100%;
-    }
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 `;
 
 const SalaryFilterSection = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 100%;
+  gap: 10px;
 `;
 
 const SalaryFilterHeader = styled.h4`
-  font-size: 18px;
+  ${
+    "" /* font-size: 18px;
   font-weight: bold;
   color: #202123;
-  margin-bottom: 10px;
+  margin-bottom: 10px; */
+  }
 `;
 
 const CardsContainer = styled.div`
@@ -284,6 +303,76 @@ const EmployeeList = () => {
       });
   }, []);
 
+  const [salaryModalOpen, setSalaryModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState(null);
+
+  const closeModal = () => {
+    setModalOpen(false);
+    setModalData(null);
+  };
+  const paymentCloseModal = () => {
+    setSalaryModalOpen(false);
+    setModalData(null);
+  };
+
+  const handleDetails = (employee, salaryData) => {
+    setModalData({ employee, salaryData });
+    setModalOpen(true);
+  };
+
+  const [effectiveFrom, setEffectiveFrom] = useState("");
+  const [effectiveTo, setEffectiveTo] = useState("");
+
+  const handlePaymentPaid = (employee, salaryData, setIsPaid) => {
+    // console.log(salaryData.payment_date.split("T")[0]);
+
+    setModalData({ employee, salaryData, setIsPaid });
+    // setEffectiveFrom(salaryData.effective_from);
+    // setEffectiveTo(salaryData.effective_to || "");
+    if (salaryData.effective_to) {
+      setEffectiveFrom(salaryData.effective_to);
+    } else {
+      setEffectiveFrom(salaryData.payment_date.split("T")[0]);
+    }
+
+    setEffectiveTo(salaryData.effective_to || "");
+    setSalaryModalOpen(true);
+  };
+
+  const handlePaymentButton = () => {
+    console.log(effectiveFrom, "kk", effectiveTo);
+
+    fetch(
+      `https://parkspotter-backened.onrender.com/accounts/salary/${modalData?.salaryData?.id}/`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          is_paid: true,
+          effective_from: effectiveFrom,
+          effective_to: effectiveTo,
+        }),
+      }
+    )
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Failed to update payment status");
+      })
+      .then((data) => {
+        console.log(data);
+        modalData.setIsPaid(true);
+        toast.success("Payment successful");
+      })
+      .catch((error) => {
+        console.error("Error updating payment status:", error);
+      });
+  };
+
   return (
     <Container>
       <FilterContainer>
@@ -337,12 +426,64 @@ const EmployeeList = () => {
           <>
             {filteredEmployees?.map((employee, index) => (
               <>
-                <EmployeeCard key={index} employee={employee} />
+                <EmployeeCard
+                  key={index}
+                  employee={employee}
+                  onDetailsClick={handleDetails}
+                  onPaymentClick={handlePaymentPaid}
+                />
               </>
             ))}
           </>
         )}
       </CardsContainer>
+      {/* EMPLOYEE DETAILS MODAL */}
+      <EmployeeDetailsModal isOpen={modalOpen} onClose={closeModal}>
+        <h1 style={{ textAlign: "center" }}>Employee Information</h1>
+        <h1>{modalData?.salaryData?.amount}</h1>
+      </EmployeeDetailsModal>
+      {/* EMPLOYEE PAYMENT MODAL */}
+      <EmployeePaymentModal
+        isOpen={salaryModalOpen}
+        onClose={paymentCloseModal}
+      >
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handlePaymentButton();
+          }}
+        >
+          <FilterSection>
+            Last Paid:
+            <Input
+              type="date"
+              value={effectiveFrom}
+              onChange={(e) => setEffectiveFrom(e.target.value)}
+              required
+            />
+          </FilterSection>
+          <FilterSection>
+            Payment Date:
+            <Input
+              type="date"
+              value={effectiveTo}
+              onChange={(e) => setEffectiveTo(e.target.value)}
+            />
+          </FilterSection>
+          <button
+            style={{
+              background: "coral",
+              padding: "5px 15px",
+              borderRadius: "5px",
+              color: "white",
+              marginTop: "5px",
+            }}
+            type="submit"
+          >
+            Payment
+          </button>
+        </form>
+      </EmployeePaymentModal>
     </Container>
   );
 };
