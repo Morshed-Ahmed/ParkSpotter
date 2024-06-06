@@ -2,13 +2,14 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { MdOutlineCheckCircle, MdBlock } from "react-icons/md";
 import toast from "react-hot-toast";
-import { Card, Button, Row, Col, Avatar, Badge, Modal } from "antd";
+import { Card, Button, Row, Col, Avatar, Badge, Modal, Form, Input } from "antd";
 
 const EmployeeCard = ({ employee, onDetailsClick, onPaymentClick }) => {
   const [salaryData, setSalaryData] = useState(null);
   const [isPaid, setIsPaid] = useState(false);
   const [isActive, setIsActive] = useState(employee.employee.is_active);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAddSalaryModalOpen, setIsAddSalaryModalOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -31,6 +32,42 @@ const EmployeeCard = ({ employee, onDetailsClick, onPaymentClick }) => {
 
   const handlePaymentClick = () => {
     onPaymentClick(employee, salaryData, setIsPaid);
+  };
+
+  const handleAddSalaryClick = () => {
+    setIsAddSalaryModalOpen(true);
+  };
+
+  const handleAddSalarySubmit = (values) => {
+    const { amount, effective_from } = values;
+    const requestData = {
+      employee: employee.employee.id,
+      amount,
+      effective_from,
+    };
+
+    fetch("https://parkspotter-backened.onrender.com/accounts/salary/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(requestData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Failed to add salary");
+      })
+      .then((data) => {
+        setSalaryData(data);
+        setIsAddSalaryModalOpen(false);
+        toast.success("Salary added successfully");
+      })
+      .catch((error) => {
+        console.error("Error adding salary:", error);
+        toast.error("Error adding salary");
+      });
   };
 
   const toggleActivationStatus = () => {
@@ -70,9 +107,15 @@ const EmployeeCard = ({ employee, onDetailsClick, onPaymentClick }) => {
         <Button type="primary" onClick={handleDetailsClick}>
           Details
         </Button>,
-        <Button type="primary" onClick={handlePaymentClick}>
-          Payment
-        </Button>,
+        salaryData ? (
+          <Button type="primary" onClick={handlePaymentClick}>
+            Payment
+          </Button>
+        ) : (
+          <Button type="primary" onClick={handleAddSalaryClick}>
+            Add Salary
+          </Button>
+        ),
       ]}
     >
       <Row justify="space-between" align="middle">
@@ -117,6 +160,34 @@ const EmployeeCard = ({ employee, onDetailsClick, onPaymentClick }) => {
         footer={null}
       >
         <h2>Employee Details</h2>
+      </Modal>
+      <Modal
+        visible={isAddSalaryModalOpen}
+        onCancel={() => setIsAddSalaryModalOpen(false)}
+        footer={null}
+      >
+        <h2>Add Salary</h2>
+        <Form onFinish={handleAddSalarySubmit}>
+          <Form.Item
+            label="Amount"
+            name="amount"
+            rules={[{ required: true, message: "Please input the amount!" }]}
+          >
+            <Input type="number" step="0.01" placeholder="10000.00" />
+          </Form.Item>
+          <Form.Item
+            label="Effective From"
+            name="effective_from"
+            rules={[{ required: true, message: "Please input the effective date!" }]}
+          >
+            <Input type="date" />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+        </Form>
       </Modal>
     </Card>
   );

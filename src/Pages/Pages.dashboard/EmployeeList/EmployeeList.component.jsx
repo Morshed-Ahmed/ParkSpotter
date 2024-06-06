@@ -1,5 +1,5 @@
-import EmployeeCard from "./EmployeeCard/EmployeeCard";
 import { useEffect, useState } from "react";
+import EmployeeCard from "./EmployeeCard/EmployeeCard";
 import EmployeeDetailsModal from "./EmployeeDetailsModal/EmployeeDetailsModal";
 import EmployeePaymentModal from "./EmployeePaymentModal/EmployeePaymentModal";
 import toast from "react-hot-toast";
@@ -22,6 +22,11 @@ const EmployeeList = () => {
   const [minSalary, setMinSalary] = useState("");
   const [maxSalary, setMaxSalary] = useState("");
   const [loading, setLoading] = useState(false);
+  const [salaryModalOpen, setSalaryModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalData, setModalData] = useState(null);
+  const [effectiveFrom, setEffectiveFrom] = useState("");
+  const [effectiveTo, setEffectiveTo] = useState("");
 
   useEffect(() => {
     setLoading(true);
@@ -83,10 +88,6 @@ const EmployeeList = () => {
     setFilteredEmployees(filtered);
   };
 
-  const [salaryModalOpen, setSalaryModalOpen] = useState(false);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [modalData, setModalData] = useState(null);
-
   const closeModal = () => {
     setModalOpen(false);
     setModalData(null);
@@ -100,9 +101,6 @@ const EmployeeList = () => {
     setModalData(employeeData);
     setModalOpen(true);
   };
-
-  const [effectiveFrom, setEffectiveFrom] = useState("");
-  const [effectiveTo, setEffectiveTo] = useState("");
 
   const handlePaymentPaid = (employee, salaryData, setIsPaid) => {
     setModalData({ employee, salaryData, setIsPaid });
