@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast"
 import { Elements } from "@stripe/react-stripe-js"
 import { stripePromise } from "./Utils/Stripe/stripe.utils.js"
 
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>

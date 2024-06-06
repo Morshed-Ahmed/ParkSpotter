@@ -21,3 +21,7 @@ textarea:focus {
   border-color: #4d5255;
   box-shadow: 0 0 10px #d3d3d4;
 }
+
+
+@import '~antd/dist/antd.css';
+
