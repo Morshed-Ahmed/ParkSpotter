@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { IoIosCloseCircleOutline } from "react-icons/io";
 import { Modal, Row, Col, Typography, Divider, Tag } from "antd";
 import { CloseButton, ModalContent, EmployeeDetail } from "./EmployeeDetailsModal.styled";
@@ -5,6 +6,22 @@ import { CloseButton, ModalContent, EmployeeDetail } from "./EmployeeDetailsModa
 const { Title, Text } = Typography;
 
 const EmployeeDetailsModal = ({ isOpen, onClose, employeeData }) => {
+  const [bookingInfo, setBookingInfo] = useState(null);
+
+  useEffect(() => {
+    if (isOpen && employeeData) {
+      fetch(`https://parkspotter-backened.onrender.com/accounts/bookings/?employee=${employeeData.employee.id}`)
+        .then((response) => response.json())
+        .then((data) => {
+          // Calculate number of bookings and total revenue
+          const totalBookings = data.length;
+          const totalRevenue = data.reduce((acc, booking) => acc + booking.total_amount, 0);
+          setBookingInfo({ totalBookings, totalRevenue });
+        })
+        .catch((error) => console.error("Error fetching bookings:", error));
+    }
+  }, [isOpen, employeeData]);
+
   if (!employeeData) {
     return null;
   }
@@ -87,6 +104,26 @@ const EmployeeDetailsModal = ({ isOpen, onClose, employeeData }) => {
                 <EmployeeDetail>
                   <Title level={5}>Adjusted Amount:</Title> 
                   <Tag color="blue">{salaryData.adjusted_amount}</Tag>
+                </EmployeeDetail>
+              </Col>
+            </Row>
+          </>
+        )}
+        {bookingInfo && (
+          <>
+            <Divider />
+            <Title level={4}>Booking Information</Title>
+            <Row gutter={[16, 16]}>
+              <Col span={12}>
+                <EmployeeDetail>
+                  <Title level={5}>Number of Bookings:</Title> 
+                  <Text>{bookingInfo.totalBookings}</Text>
+                </EmployeeDetail>
+              </Col>
+              <Col span={12}>
+                <EmployeeDetail>
+                  <Title level={5}>Total Revenue:</Title> 
+                  <Tag color="blue">${bookingInfo.totalRevenue.toFixed(2)}</Tag>
                 </EmployeeDetail>
               </Col>
             </Row>
