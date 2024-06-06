@@ -4,11 +4,11 @@ const HeroSection = () => {
     <div className="mt-36 mb-10 flex flex-col md:flex-row w-full md:w-10/12 mx-auto">
       <div className="w-full md:w-3/6 flex flex-col justify-center items-center md:items-start">
         <h1 className="mb-10 text-3xl md:text-4xl font-bold text-center md:text-left md:mb-4 ">
-          Everything for your car
+          Everything for your <br/>Parking Management
         </h1>
         <p className="mb-2 text-lg md:text-lg pt-2 md:pt-8 font-medium text-center md:text-left">
-          Begin your car journey with ParkSpotter and say goodbye to all your
-          car-related worries - one service at a time
+          Begin your buisness journey with ParkSpotter and say goodbye to all your
+          Parking-lot-related worries - one service at a time
         </p>
       </div>
       <div className="w-full md:w-3/6 mt-4 md:mt-0">

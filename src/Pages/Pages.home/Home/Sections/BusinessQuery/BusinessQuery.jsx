@@ -1,5 +1,7 @@
-import { useState } from "react"
-import styled from "styled-components"
+import { useState } from "react";
+import styled from "styled-components";
+import { db } from "../../../../../Utils/Firebase/firebase";
+import { collection, addDoc } from "firebase/firestore";
 
 const Container = styled.div`
   width: 85%;
@@ -24,7 +26,7 @@ const Container = styled.div`
     align-items: center;
     justify-content: center;
   }
-`
+`;
 
 const BusinessQueryBox = styled.div`
   display: flex;
@@ -34,7 +36,7 @@ const BusinessQueryBox = styled.div`
     flex-direction: column;
     gap: 10px;
   }
-`
+`;
 
 const BusinessQueryTitleBox = styled.div`
   flex: 1;
@@ -63,7 +65,7 @@ const BusinessQueryTitleBox = styled.div`
       line-height: 20px;
     }
   }
-`
+`;
 
 const BusinessQueryInputBox = styled.div`
   flex: 1;
@@ -98,7 +100,7 @@ const BusinessQueryInputBox = styled.div`
   @media (max-width: 768px) {
     width: 100%;
   }
-`
+`;
 
 const BusinessQuery = () => {
   const [formData, setFormData] = useState({
@@ -106,24 +108,48 @@ const BusinessQuery = () => {
     phone: "",
     emailInput: "",
     textareaInput: "",
-  })
+  });
 
   const handleChange = (e) => {
-    const { name, value } = e.target
-    let formattedValue = value
-    if (name === "phone") {
-      formattedValue = value.replace(
-        /^(\+?880)(\d{3})(\d{3})(\d{4})$/,
-        "$1$2 $3 $4"
-      )
-    }
-    setFormData({ ...formData, [name]: formattedValue })
-  }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    console.log(formData)
-  }
+  const validatePhoneNumber = (phone) => {
+    const phonePattern = /^\+880\d{3}\d{3}\d{4}$/;
+    return phonePattern.test(phone);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Basic validation
+    if (!formData.selectInput || !formData.phone || !formData.emailInput || !formData.textareaInput) {
+      alert("All fields are required");
+      return;
+    }
+
+    if (!validatePhoneNumber(formData.phone)) {
+      alert("Phone number must be in the format: +880XXXXXXXXXX");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "businessQueries"), formData);
+      console.log("Form data submitted: ", formData);
+      alert("Form submitted successfully!");
+
+      // Optionally reset the form
+      setFormData({
+        selectInput: "",
+        phone: "",
+        emailInput: "",
+        textareaInput: "",
+      });
+    } catch (error) {
+      console.error("Error submitting form data: ", error);
+    }
+  };
 
   return (
     <Container>
@@ -136,17 +162,18 @@ const BusinessQuery = () => {
         </BusinessQueryTitleBox>
         <BusinessQueryInputBox>
           <form onSubmit={handleSubmit}>
-            <label htmlFor="selectInput">Select:</label>
+            <label htmlFor="selectInput">Select your query:</label>
             <select
               id="selectInput"
               name="selectInput"
               value={formData.selectInput}
               onChange={handleChange}
             >
-              <option value="">Select...</option>
-              <option value="option1">Option 1</option>
-              <option value="option2">Option 2</option>
-              <option value="option3">Option 3</option>
+              <option value="">Please select your query</option>
+              <option value="dashboard">ParkOwner Dashboard Issues</option>
+              <option value="appSupport">Mobile App Support</option>
+              <option value="feedback">Feedback or Suggestions</option>
+              <option value="other">Other Queries</option>
             </select>
 
             <label htmlFor="phone">Phone Number:</label>
@@ -181,7 +208,7 @@ const BusinessQuery = () => {
         </BusinessQueryInputBox>
       </BusinessQueryBox>
     </Container>
-  )
-}
+  );
+};
 
-export default BusinessQuery
+export default BusinessQuery;
