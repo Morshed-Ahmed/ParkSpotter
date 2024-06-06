@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Outlet, useNavigate } from "react-router-dom";
+import { useState } from "react"
+import { Outlet, useNavigate } from "react-router-dom"
 import {
   Container,
   Content,
@@ -9,36 +9,36 @@ import {
   MenuIcon,
   MenuItem,
   OutletWrapper,
-} from "./DashBoardRoutes.styles";
+} from "./DashBoardRoutes.styles"
 import {
   DropdownContainer,
   DropdownContent,
   DropdownItem,
   CircularImageContainer,
   Image,
-} from "./DashBoardRoutes.styles";
-import UserProfile from "../Pages/Pages.UserProfile/UserProfile/UserProfile";
-import toast from "react-hot-toast";
+} from "./DashBoardRoutes.styles"
+import UserProfile from "../Pages/Pages.UserProfile/UserProfile/UserProfile"
+import toast from "react-hot-toast"
 
 const Dashboard = () => {
-  const [menuOpen, setMenuOpen] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(true)
 
   const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
+    setMenuOpen(!menuOpen)
+  }
 
   /* Profile Dropdown start */
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   const toggleDropdown = () => {
-    setIsOpen(!isOpen);
-  };
+    setIsOpen(!isOpen)
+  }
   /* Profile Dropdown end */
 
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const handleLogout = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("token")
 
     fetch("https://parkspotter-backened.onrender.com/accounts/logout/", {
       method: "GET",
@@ -49,20 +49,20 @@ const Dashboard = () => {
     })
       .then((res) => {
         // console.log(res);
-        res.json();
+        res.json()
       })
       .then((data) => {
         // console.log(data);
-        localStorage.removeItem("token");
-        localStorage.removeItem("role");
-        localStorage.removeItem("user_id");
-        navigate("/login");
-        toast.success("Log out successful");
+        localStorage.removeItem("token")
+        localStorage.removeItem("role")
+        localStorage.removeItem("user_id")
+        navigate("/login")
+        toast.success("Log out successful")
       })
       .catch((error) => {
         // console.error("Error logging out:", error);
-      });
-  };
+      })
+  }
 
   return (
     <Container>
@@ -95,29 +95,55 @@ const Dashboard = () => {
       </Header>
       <Content>
         <MenuContainer open={menuOpen}>
-          <MenuItem to={"/"} exact activeClassName="active">Home</MenuItem>
-          <MenuItem to={"/dashboard"} end activeClassName="active">Overview</MenuItem>
-          <MenuItem to={"/dashboard/CreateParkingTicket"} activeClassName="active">
+          <MenuItem to={"/"} exact activeClassName="active">
+            Home
+          </MenuItem>
+          <MenuItem to={"/dashboard"} end activeClassName="active">
+            Overview
+          </MenuItem>
+          <MenuItem
+            to={"/dashboard/CreateParkingTicket"}
+            activeClassName="active"
+          >
             Create Parking Ticket
           </MenuItem>
-          <MenuItem to={"/dashboard/AvailableParkingSlot"} activeClassName="active">
+          <MenuItem
+            to={"/dashboard/AvailableParkingSlot"}
+            activeClassName="active"
+          >
             Available Slots
           </MenuItem>
-          <MenuItem to={"/dashboard/UnpaidTickets"} activeClassName="active">Unpaid tickets</MenuItem>
+          <MenuItem to={"/dashboard/UnpaidTickets"} activeClassName="active">
+            Unpaid tickets
+          </MenuItem>
           <MenuItem to={"/dashboard/RegisterEmployee"} activeClassName="active">
             Register Employee
           </MenuItem>
-          <MenuItem to={"/dashboard/TicketPayment"} activeClassName="active">Ticket Payment</MenuItem>
-          <MenuItem to={"/dashboard/EmployeeList"} activeClassName="active">Employee List</MenuItem>
-          <MenuItem to={"/dashboard/Zones"} activeClassName="active">Zones</MenuItem>
-          <MenuItem to={"/dashboard/ParkOwnerLocation"} activeClassName="active">Location</MenuItem>
+          <MenuItem to={"/dashboard/TicketPayment"} activeClassName="active">
+            Ticket Payment
+          </MenuItem>
+          <MenuItem to={"/dashboard/EmployeeList"} activeClassName="active">
+            Employee List
+          </MenuItem>
+          <MenuItem to={"/dashboard/Salary"} activeClassName="active">
+            Salary List
+          </MenuItem>
+          <MenuItem to={"/dashboard/Zones"} activeClassName="active">
+            Zones
+          </MenuItem>
+          <MenuItem
+            to={"/dashboard/ParkOwnerLocation"}
+            activeClassName="active"
+          >
+            Location
+          </MenuItem>
         </MenuContainer>
         <OutletWrapper>
           <Outlet />
         </OutletWrapper>
       </Content>
     </Container>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard
