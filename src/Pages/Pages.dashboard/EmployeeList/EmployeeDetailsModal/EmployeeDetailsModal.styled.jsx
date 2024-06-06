@@ -1,31 +1,16 @@
 import styled from "styled-components";
 
-export const ModalBackground = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: opacity 0.3s ease;
-  opacity: ${(props) => (props.isModalOpen ? "1" : "0")};
-  visibility: ${(props) => (props.isModalOpen ? "visible" : "hidden")};
-`;
-
 export const ModalContent = styled.div`
-  background-color: #ffffff;
+  background-color: #f0f2f5;
   padding: 20px;
   border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  width: 80%;
-  max-width: 800px;
-  position: relative;
-  transition: transform 0.3s ease, opacity 0.3s ease;
-  transform: translateY(${(props) => (props.isModalOpen ? "0" : "-50px")});
-  opacity: ${(props) => (props.isModalOpen ? "1" : "0")};
+  width: 100%;
+`;
+
+export const EmployeeDetail = styled.div`
+  margin: 8px 0;
+  font-size: 16px;
+  color: #1d1d1f;
 `;
 
 export const CloseButton = styled.button`

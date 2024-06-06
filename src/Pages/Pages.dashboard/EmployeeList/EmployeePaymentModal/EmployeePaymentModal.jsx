@@ -1,18 +1,23 @@
 import { IoIosCloseCircleOutline } from "react-icons/io";
-import { CloseButton, ModalBackground, ModalContent } from "./EmployeePaymentModal.styled";
+import { Modal } from "antd";
+import { ModalContent } from "./EmployeePaymentModal.styled";
 
 const EmployeePaymentModal = ({ isOpen, onClose, children }) => {
   return (
-    <ModalBackground isModalOpen={isOpen} onClick={onClose}>
-      <ModalContent isModalOpen={isOpen} onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={onClose}>
-          <IoIosCloseCircleOutline size={"30"} />
-        </CloseButton>
+    <Modal
+      title="Payment Information"
+      visible={isOpen}
+      onCancel={onClose}
+      footer={null}
+      centered
+      width={800}
+      closeIcon={<IoIosCloseCircleOutline size={"30"} />}
+    >
+      <ModalContent>
         {children}
       </ModalContent>
-    </ModalBackground>
+    </Modal>
   );
 };
 
 export default EmployeePaymentModal;
-// original
