@@ -1,7 +1,6 @@
-import { IoIosCloseCircleOutline } from "react-icons/io";
 import styled from "styled-components";
 
-const ModalBackground = styled.div`
+export const ModalBackground = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -16,7 +15,7 @@ const ModalBackground = styled.div`
   visibility: ${(props) => (props.isModalOpen ? "visible" : "hidden")};
 `;
 
-const ModalContent = styled.div`
+export const ModalContent = styled.div`
   background-color: #ffffff;
   padding: 20px;
   border-radius: 8px;
@@ -29,7 +28,7 @@ const ModalContent = styled.div`
   opacity: ${(props) => (props.isModalOpen ? "1" : "0")};
 `;
 
-const CloseButton = styled.button`
+export const CloseButton = styled.button`
   position: absolute;
   top: 10px;
   right: 10px;
@@ -38,17 +37,3 @@ const CloseButton = styled.button`
   cursor: pointer;
   color: #202123;
 `;
-const EmployeeDetailsModal = ({ isOpen, onClose, children }) => {
-  return (
-    <ModalBackground isModalOpen={isOpen} onClick={onClose}>
-      <ModalContent isModalOpen={isOpen} onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={onClose}>
-          <IoIosCloseCircleOutline size={"30"} />
-        </CloseButton>
-        {children}
-      </ModalContent>
-    </ModalBackground>
-  );
-};
-
-export default EmployeeDetailsModal;
