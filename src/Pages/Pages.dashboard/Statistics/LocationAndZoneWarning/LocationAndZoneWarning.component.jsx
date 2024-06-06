@@ -134,6 +134,12 @@ const LocationAndZoneWarning = () => {
   const { capacity, latitude, longitude } = parkOwnerData;
   const showZoneWarning = capacity === "0";
   const showLocationWarning = !latitude || !longitude;
+
+  // If neither warning is needed, return null
+  if (!showZoneWarning && !showLocationWarning) {
+    return null;
+  }
+
   const hasBoth = showZoneWarning && showLocationWarning;
 
   return (
